@@ -1,0 +1,264 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Live Auction - Peer-to-Peer Investment</title>
+
+    <!-- Link to Bootstrap CSS -->
+    <link rel="stylesheet" href="frontend/vendor/bootstrap/css/bootstrap.min.css">
+
+    <style>
+        /* Your custom styles will remain here */
+        body {
+            font-family: Arial, sans-serif;
+            margin: 0;
+            padding: 0;
+            background-color: #f4f4f9;
+            color: #808080;
+        }
+        header {
+            background-color: #DDA0DD;
+            color: white;
+            padding: 10px 20px;
+            text-align: center;
+        }
+        nav {
+            display: flex;
+            justify-content: center;
+            background: #808080;
+            padding: 10px;
+        }
+        nav a {
+            color: white;
+            text-decoration: none;
+            margin: 0 15px;
+            font-size: 16px;
+        }
+        nav a:hover {
+            text-decoration: underline;
+        }
+        main {
+            padding: 20px;
+        }
+        .cta {
+            background-color: #DDA0DD;
+            color: white;
+            padding: 10px 20px;
+            text-align: center;
+            border-radius: 5px;
+            display: inline-block;
+            margin: 20px 0;
+            font-size: 18px;
+            text-decoration: none;
+        }
+        .cta:hover {
+            background-color: #B38CB1;
+        }
+        footer {
+            background-color: #808080;
+            color: white;
+            text-align: center;
+            padding: 10px 0;
+            margin-top: 20px;
+        }
+        .section {
+            margin: 20px 0;
+        }
+        .transactions, .marketplace {
+            background-color: #fff;
+            border: 1px solid #ccc;
+            border-radius: 5px;
+            padding: 20px;
+            max-width: 600px;
+            margin: 20px auto;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+        }
+        .transactions h3, .marketplace h3 {
+            margin-bottom: 10px;
+        }
+        .transactions table, .marketplace table {
+            width: 100%;
+            border-collapse: collapse;
+        }
+        .transactions table th, .transactions table td, .marketplace table th, .marketplace table td {
+            border: 1px solid #ddd;
+            padding: 8px;
+            text-align: left;
+        }
+        .transactions table th, .marketplace table th {
+            background-color: #DDA0DD;
+            color: white;
+        }
+        .investment-actions {
+            text-align: center;
+        }
+        .investment-actions button {
+            margin: 10px;
+            padding: 10px 20px;
+            background-color: #DDA0DD;
+            color: white;
+            border: none;
+            border-radius: 5px;
+            font-size: 16px;
+            cursor: pointer;
+        }
+        .investment-actions button:hover {
+            background-color: #B38CB1;
+        }
+    </style>
+</head>
+<body>
+    <header>
+        <h1>Live Auction</h1>
+        <p>Peer-to-Peer Investment Platform</p>
+    </header>
+
+    <nav>
+        <a href="#about">About Us</a>
+        <a href="#features">Features</a>
+        <a href="#how-it-works">How It Works</a>
+        <a href="#calculator">Profit Calculator</a>
+        <a href="#payment-methods">Payment Methods</a>
+        <a href="#transactions">Transactions</a>
+        <a href="#marketplace">Marketplace</a>
+        <a href="#contact">Contact</a>
+    </nav>
+
+    <main>
+        <section id="about" class="section">
+            <h2>About Us</h2>
+            <p>Launching on January 1, 2025, Live Auction is a revolutionary peer-to-peer investment platform where members can buy and sell LT shares to make profits. Join our community and take control of your financial future!</p>
+        </section>
+
+        <section id="features" class="section">
+            <h2>Features</h2>
+            <ul>
+                <li>Real-time trading of LT shares</li>
+                <li>Secure and transparent transactions</li>
+                <li>Interactive member dashboards</li>
+                <li>Detailed profit analytics</li>
+            </ul>
+        </section>
+
+        <section id="how-it-works" class="section">
+            <h2>How It Works</h2>
+            <ol>
+                <li>Create an account and verify your details.</li>
+                <li>Purchase LT shares using cash.</li>
+                <li>Hold your investment for a 3-day cycle.</li>
+                <li>After maturity, shares are automatically listed in the marketplace for new buyers.</li>
+                <li>Track all transactions and reinvest for continuous growth.</li>
+            </ol>
+            <a href="#" class="cta">Get Started Now</a>
+        </section>
+
+        <section id="calculator" class="section">
+            <h2>Profit Calculator</h2>
+            <div class="calculator">
+                <p>Enter your investment amount to calculate your profit:</p>
+                <input type="number" id="investment" placeholder="Enter amount (KSH)">
+                <button onclick="calculateProfit()">Calculate</button>
+                <p id="result"></p>
+            </div>
+            <script>
+                function calculateProfit() {
+                    const investment = parseFloat(document.getElementById('investment').value);
+                    if (isNaN(investment) || investment <= 0) {
+                        document.getElementById('result').textContent = "Please enter a valid investment amount.";
+                        return;
+                    }
+                    const profit = investment * 0.3;
+                    const total = investment + profit;
+                    document.getElementById('result').textContent = `Your profit after 3 days will be KSH ${profit.toFixed(2)}, for a total return of KSH ${total.toFixed(2)}.`;
+                }
+            </script>
+        </section>
+
+        <section id="payment-methods" class="section">
+            <h2>Payment Methods</h2>
+            <div class="payment-methods">
+                <h3>We accept the following payment methods:</h3>
+                <ul>
+                    <li>Mpesa</li>
+                    <li>USDT (Tether)</li>
+                </ul>
+            </div>
+        </section>
+
+        <section id="transactions" class="section">
+            <h2>Transaction Management</h2>
+            <div class="transactions">
+                <h3>Current Transactions</h3>
+                <table>
+                    <thead>
+                        <tr>
+                            <th>Investor</th>
+                            <th>Shares Purchased</th>
+                            <th>Amount (KSH)</th>
+                            <th>Status</th>
+                            <th>Actions</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td>John Doe</td>
+                            <td>5 LT Shares</td>
+                            <td>1,500</td>
+                            <td>Pending</td>
+                            <td><button>Confirm Payment</button></td>
+                        </tr>
+                        <tr>
+                            <td>Jane Smith</td>
+                            <td>10 LT Shares</td>
+                            <td>3,000</td>
+                            <td>Completed</td>
+                            <td>---</td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+        </section>
+
+        <section id="marketplace" class="section">
+            <h2>Marketplace</h2>
+            <div class="marketplace">
+                <h3>Available Shares for Sale</h3>
+                <table>
+                    <thead>
+                        <tr>
+                            <th>Seller</th>
+                            <th>Shares</th>
+                            <th>Price (KSH)</th>
+                            <th>Actions</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td>John Doe</td>
+                            <td>5 LT Shares</td>
+                            <td>1,500</td>
+                            <td><button>Buy</button></td>
+                        </tr>
+                        <tr>
+                            <td>Jane Smith</td>
+                            <td>10 LT Shares</td>
+                            <td>3,000</td>
+                            <td><button>Buy</button></td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+        </section>
+
+        <section id="contact" class="section">
+            <h2>Contact</h2>
+            <p>For inquiries, email us at <a href="mailto:support@liveauction.com">support@liveauction.com</a></p>
+        </section>
+    </main>
+
+    <footer>
+        <p>&copy; 2025 Live Auction. All rights reserved.</p>
+    </footer>
+</body>
+</html>
