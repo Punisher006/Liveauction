@@ -4,12 +4,8 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Live Auction - Peer-to-Peer Investment</title>
-
-    <!-- Link to Bootstrap CSS -->
-    <link rel="stylesheet" href="frontend/vendor/bootstrap/css/bootstrap.min.css">
-
     <style>
-        /* Your custom styles will remain here */
+        /* General styling */
         body {
             font-family: Arial, sans-serif;
             margin: 0;
@@ -23,77 +19,44 @@
             padding: 10px 20px;
             text-align: center;
         }
-        nav {
+        .nav-menu {
             display: flex;
             justify-content: center;
-            background: #808080;
+            background-color: #808080;
             padding: 10px;
         }
-        nav a {
-            color: white;
-            text-decoration: none;
+        .nav-menu ul {
+            list-style: none;
+            margin: 0;
+            padding: 0;
+            display: flex;
+            align-items: center;
+        }
+        .nav-menu li {
             margin: 0 15px;
+        }
+        .nav-menu a {
+            text-decoration: none;
+            color: white;
             font-size: 16px;
         }
-        nav a:hover {
+        .nav-menu a:hover {
             text-decoration: underline;
         }
-        main {
-            padding: 20px;
-        }
-        .cta {
-            background-color: #DDA0DD;
-            color: white;
-            padding: 10px 20px;
-            text-align: center;
-            border-radius: 5px;
-            display: inline-block;
-            margin: 20px 0;
-            font-size: 18px;
-            text-decoration: none;
-        }
-        .cta:hover {
-            background-color: #B38CB1;
-        }
-        footer {
-            background-color: #808080;
-            color: white;
-            text-align: center;
-            padding: 10px 0;
-            margin-top: 20px;
-        }
         .section {
+            margin: 20px;
+            padding: 20px;
+            background: #fff;
+            border-radius: 8px;
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+        }
+        .timer {
+            font-size: 18px;
+            color: #333;
+            text-align: center;
             margin: 20px 0;
         }
-        .transactions, .marketplace {
-            background-color: #fff;
-            border: 1px solid #ccc;
-            border-radius: 5px;
-            padding: 20px;
-            max-width: 600px;
-            margin: 20px auto;
-            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
-        }
-        .transactions h3, .marketplace h3 {
-            margin-bottom: 10px;
-        }
-        .transactions table, .marketplace table {
-            width: 100%;
-            border-collapse: collapse;
-        }
-        .transactions table th, .transactions table td, .marketplace table th, .marketplace table td {
-            border: 1px solid #ddd;
-            padding: 8px;
-            text-align: left;
-        }
-        .transactions table th, .marketplace table th {
-            background-color: #DDA0DD;
-            color: white;
-        }
-        .investment-actions {
-            text-align: center;
-        }
-        .investment-actions button {
+        .auction-actions button {
             margin: 10px;
             padding: 10px 20px;
             background-color: #DDA0DD;
@@ -103,8 +66,15 @@
             font-size: 16px;
             cursor: pointer;
         }
-        .investment-actions button:hover {
+        .auction-actions button:hover {
             background-color: #B38CB1;
+        }
+        footer {
+            background-color: #808080;
+            color: white;
+            text-align: center;
+            padding: 10px 0;
+            margin-top: 20px;
         }
     </style>
 </head>
@@ -112,153 +82,208 @@
     <header>
         <h1>Live Auction</h1>
         <p>Peer-to-Peer Investment Platform</p>
+        <nav id="navbar" class="nav-menu navbar">
+            <ul>
+                <li><a href="#hero" class="nav-link scrollto active"><i class="bx bx-home"></i> <span>Home</span></a></li>
+                <li><a href="#about" class="nav-link scrollto"><i class="bx bx-user"></i> <span>About</span></a></li>
+                <li><a href="#instructions" class="nav-link scrollto"><i class="bx bx-file-blank"></i> <span>Instructions</span></a></li>
+                <li><a href="#auction-timer" class="nav-link scrollto"><i class="bx bx-book-content"></i> <span>Auction Timers</span></a></li>
+                <li><a href="#bidding" class="nav-link scrollto"><i class="bx bx-server"></i> <span>Bidding</span></a></li>
+                <li><a href="#contact" class="nav-link scrollto"><i class="bx bx-envelope"></i> <span>Contact</span></a></li>
+            </ul>
+        </nav>
     </header>
 
-    <nav>
-        <a href="#about">About Us</a>
-        <a href="#features">Features</a>
-        <a href="#how-it-works">How It Works</a>
-        <a href="#calculator">Profit Calculator</a>
-        <a href="#payment-methods">Payment Methods</a>
-        <a href="#transactions">Transactions</a>
-        <a href="#marketplace">Marketplace</a>
-        <a href="#contact">Contact</a>
-    </nav>
+  <!-- Main Content -->
+   <main>
+    <section id="about" class="section">
+        <h2>About Us</h2>
+        <p>Welcome to Live Auction, the premier peer-to-peer investment platform. Join us to trade shares and grow your wealth!</p>
+        <p>You can invest for 4 days, 8 days, or 12 days with a 30%, 60%, and 95% Return on Investments (ROI) respectively. Feel free to select the duration of investment that suits you. The entire system depends on specific payment methods to operate.</p>
+    </section>
 
-    <main>
-        <section id="about" class="section">
-            <h2>About Us</h2>
-            <p>Launching on January 1, 2025, Live Auction is a revolutionary peer-to-peer investment platform where members can buy and sell LT shares to make profits. Join our community and take control of your financial future!</p>
-        </section>
+    <section id="instructions" class="section">
+        <h2>How It Works</h2>
+        <p>During any auction time, some people are selling shares, others are buying them, and each day new investors join the system. The Live Auction system operates based on demand and supply forces to ensure a long-term sustainable and profitable process.</p>
+        <h3>To Get Started:</h3>
+        <ol>
+            <li><strong>Create an account:</strong> Under the payment category, select <strong>Mpesa Safaricom PLC</strong> and provide accurate Mpesa details.</li>
+            <li><strong>Understand auction times:</strong> Auction times are 9:00 AM, 1:00 PM, and 7:30 PM. Timers on your dashboard will indicate the time remaining for each auction.</li>
+            <li><strong>Participate in auctions:</strong> Choose your session and refresh the page when the timer reaches 00:00:00 to access the bidding section.</li>
+            <li><strong>Bid:</strong> Enter your investment amount (Minimum KES 500), select an investment period (4 days, 8 days, or 12 days), and click <strong>Bid</strong>.</li>
+            <li><strong>Check pairings:</strong> Upon successful bidding, you'll be paired with sellers. Check their Mpesa details under <strong>Bought Shares</strong>.</li>
+            <li>If pairing is delayed, you'll be notified that pairing will occur within 24 hours. Exercise patience and check back later.</li>
+        </ol>
+    </section>
 
-        <section id="features" class="section">
-            <h2>Features</h2>
-            <ul>
-                <li>Real-time trading of LT shares</li>
-                <li>Secure and transparent transactions</li>
-                <li>Interactive member dashboards</li>
-                <li>Detailed profit analytics</li>
-            </ul>
-        </section>
+    <section id="auction-timer" class="section">
+  <h2>Auction Timers</h2>
+  <div class="timer">
+    <p>Next Auction Time: <span id="timer"></span></p>
+  </div>
+  <script>
+    function updateTimer() {
+      // Auction time slots: start and end times
+      const auctionSlots = [
+        { start: "09:00:00", end: "10:00:00" },
+        { start: "13:00:00", end: "14:00:00" },
+        { start: "19:30:00", end: "20:30:00" },
+      ];
 
-        <section id="how-it-works" class="section">
-            <h2>How It Works</h2>
-            <ol>
-                <li>Create an account and verify your details.</li>
-                <li>Purchase LT shares using cash.</li>
-                <li>Hold your investment for a 3-day cycle.</li>
-                <li>After maturity, shares are automatically listed in the marketplace for new buyers.</li>
-                <li>Track all transactions and reinvest for continuous growth.</li>
-            </ol>
-            <a href="#" class="cta">Get Started Now</a>
-        </section>
+      const now = new Date();
+      let nextSlot = null;
 
-        <section id="calculator" class="section">
-            <h2>Profit Calculator</h2>
-            <div class="calculator">
-                <p>Enter your investment amount to calculate your profit:</p>
-                <input type="number" id="investment" placeholder="Enter amount (KSH)">
-                <button onclick="calculateProfit()">Calculate</button>
-                <p id="result"></p>
-            </div>
-            <script>
-                function calculateProfit() {
-                    const investment = parseFloat(document.getElementById('investment').value);
-                    if (isNaN(investment) || investment <= 0) {
-                        document.getElementById('result').textContent = "Please enter a valid investment amount.";
-                        return;
-                    }
-                    const profit = investment * 0.3;
-                    const total = investment + profit;
-                    document.getElementById('result').textContent = `Your profit after 3 days will be KSH ${profit.toFixed(2)}, for a total return of KSH ${total.toFixed(2)}.`;
+      // Find the next auction slot
+      for (const slot of auctionSlots) {
+        const [startHours, startMinutes, startSeconds] = slot.start.split(":").map(Number);
+        const start = new Date();
+        start.setHours(startHours, startMinutes, startSeconds, 0);
+
+        if (now < start) {
+          nextSlot = { startTime: start, endTime: slot.end };
+          break;
+        }
+      }
+
+      // If no more slots today, set to the first slot tomorrow
+      if (!nextSlot) {
+        const [startHours, startMinutes, startSeconds] = auctionSlots[0].start.split(":").map(Number);
+        const tomorrow = new Date();
+        tomorrow.setDate(tomorrow.getDate() + 1);
+        tomorrow.setHours(startHours, startMinutes, startSeconds, 0);
+        nextSlot = { startTime: tomorrow, endTime: auctionSlots[0].end };
+      }
+
+      // Countdown logic
+      const interval = setInterval(() => {
+        const now = new Date();
+        const diff = nextSlot.startTime - now;
+
+        if (diff <= 0) {
+          // Auction time has started, calculate time remaining in the slot
+          const [endHours, endMinutes, endSeconds] = nextSlot.endTime.split(":").map(Number);
+          const end = new Date(nextSlot.startTime);
+          end.setHours(endHours, endMinutes, endSeconds);
+
+          if (now < end) {
+            document.getElementById("timer").textContent = "Auction ongoing! Ends at: " + nextSlot.endTime;
+          } else {
+            // Slot ended, reload to display next auction
+            clearInterval(interval);
+            document.getElementById("timer").textContent = "Auction Closed. Refresh for Next Slot.";
+          }
+          return;
+        }
+
+        // Update countdown for next auction
+        const hours = String(Math.floor(diff / (1000 * 60 * 60))).padStart(2, "0");
+        const minutes = String(Math.floor((diff % (1000 * 60 * 60)) / (1000 * 60))).padStart(2, "0");
+        const seconds = String(Math.floor((diff % (1000 * 60)) / 1000)).padStart(2, "0");
+
+        document.getElementById("timer").textContent = `${hours}:${minutes}:${seconds}`;
+      }, 1000);
+    }
+
+    updateTimer();
+  </script>
+</section>
+
+    <section id="calculator" class="section">
+        <h2>Profit Calculator</h2>
+        <div class="calculator">
+            <p>Enter your investment amount to calculate your profit:</p>
+            <input type="number" id="investment" placeholder="Enter amount (KSH)">
+            <label for="period">Select Investment Period:</label><br>
+            <select id="period" name="period" required>
+                <option value="4">4 Days (30%)</option>
+                <option value="8">8 Days (60%)</option>
+                <option value="12">12 Days (95%)</option>
+            </select><br><br>
+            <button onclick="calculateProfit()">Calculate</button>
+            <p id="result"></p>
+        </div>
+        <script>
+            function calculateProfit() {
+                const investment = parseFloat(document.getElementById('investment').value);
+                const period = parseInt(document.getElementById('period').value);
+
+                if (isNaN(investment) || investment <= 0) {
+                    document.getElementById('result').textContent = "Please enter a valid investment amount.";
+                    return;
                 }
-            </script>
-        </section>
 
-        <section id="payment-methods" class="section">
-            <h2>Payment Methods</h2>
-            <div class="payment-methods">
-                <h3>We accept the following payment methods:</h3>
-                <ul>
-                    <li>Mpesa</li>
-                    <li>USDT (Tether)</li>
-                </ul>
-            </div>
-        </section>
+                let profitRate;
+                switch (period) {
+                    case 4:
+                        profitRate = 0.3; // 30% for 4 days
+                        break;
+                    case 8:
+                        profitRate = 0.6; // 60% for 8 days
+                        break;
+                    case 12:
+                        profitRate = 0.95; // 95% for 12 days
+                        break;
+                    default:
+                        document.getElementById('result').textContent = "Invalid period selected.";
+                        return;
+                }
 
-        <section id="transactions" class="section">
-            <h2>Transaction Management</h2>
-            <div class="transactions">
-                <h3>Current Transactions</h3>
-                <table>
-                    <thead>
-                        <tr>
-                            <th>Investor</th>
-                            <th>Shares Purchased</th>
-                            <th>Amount (KSH)</th>
-                            <th>Status</th>
-                            <th>Actions</th>
-                        </tr>
-                    </thead>
-                    <tbody>
-                        <tr>
-                            <td>John Doe</td>
-                            <td>5 LT Shares</td>
-                            <td>1,500</td>
-                            <td>Pending</td>
-                            <td><button>Confirm Payment</button></td>
-                        </tr>
-                        <tr>
-                            <td>Jane Smith</td>
-                            <td>10 LT Shares</td>
-                            <td>3,000</td>
-                            <td>Completed</td>
-                            <td>---</td>
-                        </tr>
-                    </tbody>
-                </table>
-            </div>
-        </section>
+                const profit = investment * profitRate;
+                const total = investment + profit;
+                document.getElementById('result').textContent = `For a ${period}-day investment: Your profit will be KSH ${profit.toFixed(2)}, for a total return of KSH ${total.toFixed(2)}.`;
+            }
+        </script>
+    </section>
 
-        <section id="marketplace" class="section">
-            <h2>Marketplace</h2>
-            <div class="marketplace">
-                <h3>Available Shares for Sale</h3>
-                <table>
-                    <thead>
-                        <tr>
-                            <th>Seller</th>
-                            <th>Shares</th>
-                            <th>Price (KSH)</th>
-                            <th>Actions</th>
-                        </tr>
-                    </thead>
-                    <tbody>
-                        <tr>
-                            <td>John Doe</td>
-                            <td>5 LT Shares</td>
-                            <td>1,500</td>
-                            <td><button>Buy</button></td>
-                        </tr>
-                        <tr>
-                            <td>Jane Smith</td>
-                            <td>10 LT Shares</td>
-                            <td>3,000</td>
-                            <td><button>Buy</button></td>
-                        </tr>
-                    </tbody>
-                </table>
-            </div>
-        </section>
+    <section id="bidding" class="section">
+    <h2>Bidding</h2>
+    <div class="auction-actions">
+        <form id="bid-form">
+            <label for="investment">Enter Amount (KES 500 - 100,000):</label><br>
+            <input type="number" id="investment" name="investment" min="500" max="1000000" required><br><br>
 
-        <section id="contact" class="section">
-            <h2>Contact</h2>
-            <p>For inquiries, email us at <a href="mailto:support@liveauction.com">support@liveauction.com</a></p>
-        </section>
-    </main>
+            <label for="period">Select Investment Period:</label><br>
+            <select id="period" name="period" required>
+                <option value="4">4 Days (30% ROI)</option>
+                <option value="8">8 Days (60% ROI)</option>
+                <option value="12">12 Days (95% ROI)</option>
+            </select><br><br>
 
-    <footer>
-        <p>&copy; 2025 Live Auction. All rights reserved.</p>
-    </footer>
-</body>
-</html>
+            <button type="submit">Bid</button>
+        </form>
+    </div>
+    <script>
+        // Simulate user login status
+        const isLoggedIn = false; // Replace this with a server-side check in a real application
+
+        const bidForm = document.getElementById("bid-form");
+        bidForm.addEventListener("submit", (e) => {
+            e.preventDefault();
+
+            // Check if user is logged in
+            if (!isLoggedIn) {
+                alert("Authentication required. Please login to continue.");
+                window.location.href = "login.html"; // Redirect to the login page
+                return;
+            }
+
+            const investment = parseFloat(document.getElementById("investment").value);
+            const period = document.getElementById("period").value;
+
+            // Validate investment amount
+            if (investment < 500 || investment > 100000) {
+                alert("Investment must be between KES 500 and KES 100,000.");
+                return;
+            }
+
+            alert(`Bid successful for KES ${investment}, for a ${period}-day period. You'll be logged out to allow others to bid.`);
+            window.location.reload();
+        });
+    </script>
+</section>
+
+    <section id="contact" class="section">
+        <h2>Contact Us</h2>
+        <p>For more information or inquiries, please contact our support team at <a href="mailto:support@liveauction.com">support@liveauction.com</a>.</p>
+    </section>
+</main>
