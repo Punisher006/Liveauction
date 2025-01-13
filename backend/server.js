@@ -1,8 +1,12 @@
 const express = require("express");
+const jsonwebtoken = require("jsonwebtoken");
+const mysql= require("mysql");
 const mongoose = require("mongoose");
 const bodyParser = require("body-parser");
 const cors = require("cors");
 
+
+// Import routes
 const authRoutes = require("./routes/auth");
 
 const app = express();
