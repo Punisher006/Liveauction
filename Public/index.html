@@ -6,76 +6,150 @@
     <title>Live Auction - Peer-to-Peer Investment</title>
     <style>
         /* General styling */
-        body {
-            font-family: Arial, sans-serif;
-            margin: 0;
-            padding: 0;
-            background-color: #f4f4f9;
-            color: #808080;
-        }
-        header {
-            background-color: #DDA0DD;
-            color: white;
-            padding: 10px 20px;
-            text-align: center;
-        }
-        .nav-menu {
-            display: flex;
-            justify-content: center;
-            background-color: #808080;
-            padding: 10px;
-        }
+    body {
+        font-family: 'Roboto', Arial, sans-serif;
+        margin: 0;
+        padding: 0;
+        background-color: #f8f9fa; /* Light gray background for contrast */
+        color: #343a40; /* Dark gray text for readability */
+    }
+    header {
+        background-color: #6c63ff; /* Modern purple shade */
+        color: white;
+        padding: 20px 20px;
+        text-align: center;
+        box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1); /* Subtle shadow */
+    }
+    header h1 {
+        font-size: 2.2rem;
+        margin: 0;
+    }
+    header p {
+        font-size: 1rem;
+        margin: 5px 0 0;
+    }
+
+    .nav-menu {
+        display: flex;
+        justify-content: center;
+        background-color: #495057; /* Neutral dark gray */
+        padding: 15px;
+    }
+    .nav-menu ul {
+        list-style: none;
+        margin: 0;
+        padding: 0;
+        display: flex;
+        align-items: center;
+    }
+    .nav-menu li {
+        margin: 0 15px;
+    }
+    .nav-menu a {
+        text-decoration: none;
+        color: white;
+        font-size: 1rem;
+        transition: color 0.3s, text-decoration 0.3s;
+    }
+    .nav-menu a:hover {
+        color: #f8f9fa; /* Slightly lighter for hover */
+        text-decoration: underline;
+    }
+
+    .section {
+        margin: 20px;
+        padding: 20px;
+        background: #ffffff; /* White cards for content */
+        border-radius: 10px;
+        box-shadow: 0 3px 8px rgba(0, 0, 0, 0.1); /* Subtle shadow for depth */
+    }
+    .section h2 {
+        font-size: 1.8rem;
+        color: #6c63ff; /* Accent color */
+        margin-bottom: 15px;
+    }
+
+    .timer, .auction-actions, .calculator {
+        text-align: center;
+    }
+    .timer p {
+        font-size: 1.2rem;
+        color: #495057;
+    }
+
+    input, select, button {
+        padding: 10px;
+        margin: 5px 0;
+        font-size: 1rem;
+        border: 1px solid #ced4da;
+        border-radius: 5px;
+    }
+    input:focus, select:focus {
+        outline: none;
+        border-color: #6c63ff; /* Highlight focus */
+        box-shadow: 0 0 5px rgba(108, 99, 255, 0.5);
+    }
+    button {
+        background-color: #6c63ff;
+        color: white;
+        border: none;
+        cursor: pointer;
+        transition: background-color 0.3s;
+    }
+    button:hover {
+        background-color: #554fb8; /* Slightly darker hover */
+    }
+
+    table {
+        width: 100%;
+        border-collapse: collapse;
+        margin-top: 20px;
+    }
+    table th, table td {
+        text-align: left;
+        padding: 10px;
+        border: 1px solid #dee2e6;
+    }
+    table th {
+        background-color: #6c63ff;
+        color: white;
+        font-weight: bold;
+    }
+    table tr:nth-child(even) {
+        background-color: #f8f9fa;
+    }
+
+    footer {
+        background-color: #343a40;
+        color: white;
+        text-align: center;
+        padding: 10px 0;
+        margin-top: 20px;
+    }
+    footer a {
+        color: #f8f9fa;
+        text-decoration: underline;
+        transition: color 0.3s;
+    }
+    footer a:hover {
+        color: #6c63ff; /* Accent color hover */
+    }
+
+    /* Responsiveness */
+    @media (max-width: 768px) {
         .nav-menu ul {
-            list-style: none;
-            margin: 0;
-            padding: 0;
-            display: flex;
-            align-items: center;
+            flex-direction: column;
         }
         .nav-menu li {
-            margin: 0 15px;
-        }
-        .nav-menu a {
-            text-decoration: none;
-            color: white;
-            font-size: 16px;
-        }
-        .nav-menu a:hover {
-            text-decoration: underline;
+            margin: 10px 0;
         }
         .section {
-            margin: 20px;
-            padding: 20px;
-            background: #fff;
-            border-radius: 8px;
-            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+            padding: 15px;
         }
-        .timer {
-            font-size: 18px;
-            color: #333;
-            text-align: center;
-            margin: 20px 0;
+        table {
+            font-size: 0.9rem;
         }
-        .auction-actions button {
-            margin: 10px;
-            padding: 10px 20px;
-            background-color: #DDA0DD;
-            color: white;
-            border: none;
-            border-radius: 5px;
-            font-size: 16px;
-            cursor: pointer;
-        }
-        .auction-actions button:hover {
-            background-color: #B38CB1;
-        }
-        footer {
-            background-color: #808080;
-            color: white;
-            text-align: center;
-            padding: 10px 0;
-            margin-top: 20px;
-        }
+    }
     </style>
 </head>
 <body>
@@ -96,12 +170,15 @@
 
   <!-- Main Content -->
    <main>
+
+    <!-- About Us Section -->
     <section id="about" class="section">
         <h2>About Us</h2>
         <p>Welcome to Live Auction, the premier peer-to-peer investment platform. Join us to trade shares and grow your wealth!</p>
         <p>You can invest for 4 days, 8 days, or 12 days with a 30%, 60%, and 95% Return on Investments (ROI) respectively. Feel free to select the duration of investment that suits you. The entire system depends on specific payment methods to operate.</p>
     </section>
 
+    <!-- Instructions Section -->
     <section id="instructions" class="section">
         <h2>How It Works</h2>
         <p>During any auction time, some people are selling shares, others are buying them, and each day new investors join the system. The Live Auction system operates based on demand and supply forces to ensure a long-term sustainable and profitable process.</p>
@@ -110,12 +187,61 @@
             <li><strong>Create an account:</strong> Under the payment category, select <strong>Mpesa Safaricom PLC</strong> and provide accurate Mpesa details.</li>
             <li><strong>Understand auction times:</strong> Auction times are 9:00 AM, 1:00 PM, and 7:30 PM. Timers on your dashboard will indicate the time remaining for each auction.</li>
             <li><strong>Participate in auctions:</strong> Choose your session and refresh the page when the timer reaches 00:00:00 to access the bidding section.</li>
-            <li><strong>Bid:</strong> Enter your investment amount (Minimum KES 500), select an investment period (4 days, 8 days, or 12 days), and click <strong>Bid</strong>.</li>
+            <li><strong>Bid:</strong> Enter your investment amount (Minimum KES 500), select an investment period (4 days, 8 days, or 12 days), and click <strong>Buy</strong>.</li>
             <li><strong>Check pairings:</strong> Upon successful bidding, you'll be paired with sellers. Check their Mpesa details under <strong>Bought Shares</strong>.</li>
             <li>If pairing is delayed, you'll be notified that pairing will occur within 24 hours. Exercise patience and check back later.</li>
         </ol>
     </section>
 
+    <!-- Profit Calculator Section -->
+    <section id="calculator" class="section">
+        <h2>Profit Calculator</h2>
+        <div class="calculator">
+            <p>Enter your investment amount to calculate your profit:</p>
+            <input type="number" id="investment" placeholder="Enter amount (KSH)">
+            <label for="period">Select Investment Period:</label><br>
+            <select id="period" name="period" required>
+                <option value="4">4 Days (30%)</option>
+                <option value="8">8 Days (60%)</option>
+                <option value="12">12 Days (95%)</option>
+            </select><br><br>
+            <button onclick="calculateProfit()">Calculate</button>
+            <p id="result"></p>
+        </div>
+        <script>
+            function calculateProfit() {
+                const investment = parseFloat(document.getElementById('investment').value);
+                const period = parseInt(document.getElementById('period').value);
+
+                if (isNaN(investment) || investment <= 0) {
+                    document.getElementById('result').textContent = "Please enter a valid investment amount.";
+                    return;
+                }
+
+                let profitRate;
+                switch (period) {
+                    case 4:
+                        profitRate = 0.3; // 30% for 4 days
+                        break;
+                    case 8:
+                        profitRate = 0.6; // 60% for 8 days
+                        break;
+                    case 12:
+                        profitRate = 0.95; // 95% for 12 days
+                        break;
+                    default:
+                        document.getElementById('result').textContent = "Invalid period selected.";
+                        return;
+                }
+
+                const profit = investment * profitRate;
+                const total = investment + profit;
+                document.getElementById('result').textContent = `For a ${period}-day investment: Your profit will be KSH ${profit.toFixed(2)}, for a total return of KSH ${total.toFixed(2)}.`;
+            }
+        </script>
+    </section>
+
+    <!-- Auction Timers Section -->
     <section id="auction-timer" class="section">
   <h2>Auction Timers</h2>
   <div class="timer">
@@ -188,53 +314,7 @@
   </script>
 </section>
 
-    <section id="calculator" class="section">
-        <h2>Profit Calculator</h2>
-        <div class="calculator">
-            <p>Enter your investment amount to calculate your profit:</p>
-            <input type="number" id="investment" placeholder="Enter amount (KSH)">
-            <label for="period">Select Investment Period:</label><br>
-            <select id="period" name="period" required>
-                <option value="4">4 Days (30%)</option>
-                <option value="8">8 Days (60%)</option>
-                <option value="12">12 Days (95%)</option>
-            </select><br><br>
-            <button onclick="calculateProfit()">Calculate</button>
-            <p id="result"></p>
-        </div>
-        <script>
-            function calculateProfit() {
-                const investment = parseFloat(document.getElementById('investment').value);
-                const period = parseInt(document.getElementById('period').value);
-
-                if (isNaN(investment) || investment <= 0) {
-                    document.getElementById('result').textContent = "Please enter a valid investment amount.";
-                    return;
-                }
-
-                let profitRate;
-                switch (period) {
-                    case 4:
-                        profitRate = 0.3; // 30% for 4 days
-                        break;
-                    case 8:
-                        profitRate = 0.6; // 60% for 8 days
-                        break;
-                    case 12:
-                        profitRate = 0.95; // 95% for 12 days
-                        break;
-                    default:
-                        document.getElementById('result').textContent = "Invalid period selected.";
-                        return;
-                }
-
-                const profit = investment * profitRate;
-                const total = investment + profit;
-                document.getElementById('result').textContent = `For a ${period}-day investment: Your profit will be KSH ${profit.toFixed(2)}, for a total return of KSH ${total.toFixed(2)}.`;
-            }
-        </script>
-    </section>
-
+<!-- Bidding Section -->
     <section id="bidding" class="section">
     <h2>Bidding</h2>
     <div class="auction-actions">
@@ -249,10 +329,11 @@
                 <option value="12">12 Days (95% ROI)</option>
             </select><br><br>
 
-            <button type="submit">Bid</button>
+            <button type="submit">Buy</button>
         </form>
     </div>
     <script>
+
         // Simulate user login status
         const isLoggedIn = false; // Replace this with a server-side check in a real application
 
@@ -282,6 +363,119 @@
     </script>
 </section>
 
+<!-- ======= Bid Status Section ======= -->
+    <section id="bid-status" class="section">
+        <h2>Your Bid Status</h2>
+        <div id="bid-status-container">
+            <p>Loading your bid status...</p>
+        </div>
+    </section>
+
+<!-- Add script -->
+    <script>
+        // Fetch and display bid status
+        document.addEventListener("DOMContentLoaded", async () => {
+            const container = document.getElementById("bid-status-container");
+
+            try {
+                // Replace this URL with your API endpoint
+                const response = await fetch("http://localhost:5000/api/bid-status", {
+                    headers: {
+                        Authorization: `Bearer ${localStorage.getItem("token")}`, // Use token for authentication
+                    },
+                });
+
+                if (!response.ok) {
+                    throw new Error("Failed to fetch bid status. Please log in.");
+                }
+
+                const bidStatus = await response.json();
+
+                if (bidStatus.length === 0) {
+                    container.innerHTML = "<p>No bids found. Place a bid to see your status.</p>";
+                    return;
+                }
+
+                // Dynamically build the bid status table
+                let statusHTML = `
+                    <table>
+                        <thead>
+                            <tr>
+                                <th>Bid Amount</th>
+                                <th>Status</th>
+                                <th>Seller(s) Details</th>
+                                <th>Time Remaining</th>
+                                <th>Actions</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                `;
+
+                bidStatus.forEach(bid => {
+                    const sellerInfo = bid.sellers.length
+                        ? bid.sellers.map(seller => `
+                            <p>
+                                <strong>Mpesa Number:</strong> ${seller.phone}<br>
+                                <strong>Mpesa Name:</strong> ${seller.name}<br>
+                                <strong>Status:</strong> ${seller.status}<br>
+                            </p>
+                          `).join("")
+                        : "<p>The system will allocate you a seller within 24 hours.</p>";
+
+                    const timer = bid.timer
+                        ? `<p>${bid.timer} hours remaining</p>`
+                        : "<p>Activated</p>";
+
+                    const actions = bid.status === "paired" ? `
+                        <button onclick="confirmPayment('${bid.id}')">Confirm Payment</button>
+                    ` : "N/A";
+
+                    statusHTML += `
+                        <tr>
+                            <td>${bid.amount} KES</td>
+                            <td>${bid.status}</td>
+                            <td>${sellerInfo}</td>
+                            <td>${timer}</td>
+                            <td>${actions}</td>
+                        </tr>
+                    `;
+                });
+
+                statusHTML += "</tbody></table>";
+                container.innerHTML = statusHTML;
+
+            } catch (error) {
+                console.error("Error fetching bid status:", error);
+                container.innerHTML = `<p>${error.message}</p>`;
+            }
+        });
+
+        // Confirm payment for a specific bid
+        async function confirmPayment(bidId) {
+            try {
+                const response = await fetch(`http://localhost:5000/api/confirm-payment/${bidId}`, {
+                    method: "POST",
+                    headers: {
+                        "Content-Type": "application/json",
+                        Authorization: `Bearer ${localStorage.getItem("token")}`, // Use token for authentication
+                    },
+                });
+
+                if (!response.ok) {
+                    throw new Error("Failed to confirm payment.");
+                }
+
+                alert("Payment confirmed successfully!");
+                window.location.reload();
+            } catch (error) {
+                console.error("Error confirming payment:", error);
+                alert("Failed to confirm payment. Please try again.");
+            }
+        }
+    </script>
+</section>
+
+    <!-- Contact Section -->
     <section id="contact" class="section">
         <h2>Contact Us</h2>
         <p>For more information or inquiries, please contact our support team at <a href="mailto:support@liveauction.com">support@liveauction.com</a>.</p>
