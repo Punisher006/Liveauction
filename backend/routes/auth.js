@@ -1,4 +1,3 @@
-// routes/auth.js
 const express = require("express");
 const bcrypt = require("bcrypt");
 const jwt = require("jsonwebtoken");
@@ -9,12 +8,29 @@ const router = express.Router();
 // JWT Secret
 const JWT_SECRET = "your_jwt_secret_key"; // Replace with a secure key
 
+// Password validation function
+function validatePassword(password) {
+    const minLength = 8;
+    const hasUppercase = /[A-Z]/.test(password);
+    const hasLowercase = /[a-z]/.test(password);
+    const hasNumber = /\d/.test(password);
+    const hasSpecialChar = /[!@#$%^&*(),.?":{}|<>]/.test(password);
+
+    return password.length >= minLength && hasUppercase && hasLowercase && hasNumber && hasSpecialChar;
+}
+
 // Create Account
 router.post("/register", async (req, res) => {
     const { email, password } = req.body;
 
     if (!email || !password) {
         return res.status(400).json({ message: "Email and password are required" });
+    }
+
+    if (!validatePassword(password)) {
+        return res.status(400).json({
+            message: "Password must be at least 8 characters long and include uppercase, lowercase, a number, and a special character.",
+        });
     }
 
     try {
@@ -49,7 +65,7 @@ router.post("/login", async (req, res) => {
         // Find the user
         const user = await User.findOne({ email });
         if (!user) {
-            return res.status(400).json({ message: "Invalid email or password" });
+            return res.status(404).json({ redirect: "/createAccount.html", message: "Account not found. Please create one." });
         }
 
         // Compare passwords
@@ -64,21 +80,6 @@ router.post("/login", async (req, res) => {
         res.status(200).json({ message: "Login successful", token });
     } catch (error) {
         res.status(500).json({ message: "Internal server error" });
-    }
-});
-
-// Verify Token Middleware
-router.get("/verify", (req, res) => {
-    const token = req.headers["authorization"];
-    if (!token) {
-        return res.status(401).json({ message: "No token provided" });
-    }
-
-    try {
-        const decoded = jwt.verify(token, JWT_SECRET);
-        res.status(200).json({ message: "Authenticated", user: decoded });
-    } catch (error) {
-        res.status(401).json({ message: "Invalid token" });
     }
 });
 
