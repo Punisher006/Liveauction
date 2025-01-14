@@ -1,31 +1,16 @@
-body {
-    font-family: Arial, sans-serif;
+@import url("https://fonts.googleapis.com/css?family=Poppins:wght@300;400;500;600;700;800;900&display=swap");
+
+*   {
     margin: 0;
     padding: 0;
-    background-color: #f8f9fa;
+    box-sizing: border-box;
+    font-family: 'Poppins', sans-serif;
 }
 
-header {
-    background-color: #343a40;
-    color: #fff;
-    padding: 1rem 0;
-}
-
-header h1 {
-    text-align: center;
-}
-
-nav ul {
-    list-style: none;
+body {
     display: flex;
     justify-content: center;
-}
-
-nav ul li {
-    margin: 0 1rem;
-}
-
-nav ul li a {
-    text-decoration: none;
-    color: #fff;
+    align-items: center;
+    min-height: 100vh;
+    background: seagreen;
 }
