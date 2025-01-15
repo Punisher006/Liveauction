@@ -66,6 +66,15 @@
             color: #f8f9fa;
             text-decoration: underline;
         }
+        table {
+            width: 100%;
+            border-collapse: collapse;
+        }
+        th, td {
+            padding: 10px;
+            text-align: left;
+            border-bottom: 1px solid #ddd;
+        }
     </style>
 </head>
 <body>
@@ -93,10 +102,17 @@
                 document.addEventListener("DOMContentLoaded", async () => {
                     const container = document.getElementById("bid-status-container");
 
+                    // Check if user is logged in
+                    const token = localStorage.getItem("token");
+                    if (!token) {
+                        container.innerHTML = "<p>Please log in to view your bids.</p>";
+                        return;
+                    }
+
                     try {
                         const response = await fetch("http://localhost:5000/api/bid-status", {
                             headers: {
-                                Authorization: `Bearer ${localStorage.getItem("token")}`,
+                                Authorization: `Bearer ${token}`,
                             },
                         });
 
@@ -146,7 +162,7 @@
         <section id="profile" class="section">
             <h2>Profile</h2>
             <p>Update your profile details or payment information here.</p>
-            <form>
+            <form id="profile-form">
                 <label for="mpesa">Mpesa Number:</label><br>
                 <input type="text" id="mpesa" placeholder="Enter your Mpesa number"><br><br>
                 <button type="submit">Update Profile</button>
@@ -156,6 +172,36 @@
     <footer>
         <p>&copy; 2025 Live Auction. All rights reserved. <a href="contact.html">Contact Support</a></p>
     </footer>
+
+    <script>
+        document.getElementById("profile-form").addEventListener("submit", async (event) => {
+            event.preventDefault();
+
+            const mpesaNumber = document.getElementById("mpesa").value;
+
+            if (!mpesaNumber) {
+                alert("Please enter your Mpesa number.");
+                return;
+            }
+
+            try {
+                const response = await fetch("http://localhost:5000/api/update-profile", {
+                    method: "POST",
+                    headers: {
+                        "Content-Type": "application/json",
+                        Authorization: `Bearer ${localStorage.getItem("token")}`,
+                    },
+                    body: JSON.stringify({ mpesa: mpesaNumber }),
+                });
+
+                if (!response.ok) throw new Error("Failed to update profile.");
+
+                const result = await response.json();
+                alert(result.message || "Profile updated successfully.");
+            } catch (error) {
+                alert(error.message);
+            }
+        });
+    </script>
 </body>
 </html>
-

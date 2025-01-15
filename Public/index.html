@@ -333,7 +333,7 @@
     <script>
 
         // Simulate user login status
-        const isLoggedIn = false; // Replace this with a server-side check in a real application
+        const isLoggedIn = <?php echo isset($_SESSION['user_id']) ? 'true' : 'false'; ?>; // Check server-side login
 
         const bidForm = document.getElementById("bid-form");
         bidForm.addEventListener("submit", (e) => {
