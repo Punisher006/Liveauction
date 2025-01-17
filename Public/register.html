@@ -138,6 +138,12 @@
     </div>
 
     <script>
+        // Function to sanitize input
+        function sanitizeInput(input) {
+            return input.replace(/[<>'"]/g, ''); // Removes special characters to prevent injection
+        }
+        
+       // Event listener for form submission
         document.getElementById('registerForm').addEventListener('submit', function(event) {
             event.preventDefault();
 
@@ -167,8 +173,29 @@
                 return;
             }
 
-            // If all validations pass
-            alert('Registration successful!');
+            // Prepare data to send to PHP
+            const formData = new FormData();
+            formData.append('username', username);
+            formData.append('email', email);
+            formData.append('password', password);
+            formData.append('confirm_password', confirmPassword);
+
+            fetch('register.php', {
+                method: 'POST',
+                body: formData
+            })
+            .then(response => response.json())
+            .then(data => {
+                if (data.success) {
+                    alert('Registration successful!');
+                    window.location.href = 'login.html'; // Redirect to login page
+                } else {
+                    alert(data.message); // Display any error messages from PHP
+                }
+            })
+            .catch(error => {
+                alert('Error during registration.');
+            });
         });
     </script>
 

@@ -6,482 +6,289 @@
     <title>Live Auction - Peer-to-Peer Investment</title>
     <style>
         /* General styling */
-    body {
-        font-family: 'Roboto', Arial, sans-serif;
-        margin: 0;
-        padding: 0;
-        background-color: #f8f9fa; /* Light gray background for contrast */
-        color: #343a40; /* Dark gray text for readability */
-    }
-    header {
-        background-color: #6c63ff; /* Modern purple shade */
-        color: white;
-        padding: 20px 20px;
-        text-align: center;
-        box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1); /* Subtle shadow */
-    }
-    header h1 {
-        font-size: 2.2rem;
-        margin: 0;
-    }
-    header p {
-        font-size: 1rem;
-        margin: 5px 0 0;
-    }
-
-    .nav-menu {
-        display: flex;
-        justify-content: center;
-        background-color: #495057; /* Neutral dark gray */
-        padding: 15px;
-    }
-    .nav-menu ul {
-        list-style: none;
-        margin: 0;
-        padding: 0;
-        display: flex;
-        align-items: center;
-    }
-    .nav-menu li {
-        margin: 0 15px;
-    }
-    .nav-menu a {
-        text-decoration: none;
-        color: white;
-        font-size: 1rem;
-        transition: color 0.3s, text-decoration 0.3s;
-    }
-    .nav-menu a:hover {
-        color: #f8f9fa; /* Slightly lighter for hover */
-        text-decoration: underline;
-    }
-
-    .section {
-        margin: 20px;
-        padding: 20px;
-        background: #ffffff; /* White cards for content */
-        border-radius: 10px;
-        box-shadow: 0 3px 8px rgba(0, 0, 0, 0.1); /* Subtle shadow for depth */
-    }
-    .section h2 {
-        font-size: 1.8rem;
-        color: #6c63ff; /* Accent color */
-        margin-bottom: 15px;
-    }
-
-    .timer, .auction-actions, .calculator {
-        text-align: center;
-    }
-    .timer p {
-        font-size: 1.2rem;
-        color: #495057;
-    }
-
-    input, select, button {
-        padding: 10px;
-        margin: 5px 0;
-        font-size: 1rem;
-        border: 1px solid #ced4da;
-        border-radius: 5px;
-    }
-    input:focus, select:focus {
-        outline: none;
-        border-color: #6c63ff; /* Highlight focus */
-        box-shadow: 0 0 5px rgba(108, 99, 255, 0.5);
-    }
-    button {
-        background-color: #6c63ff;
-        color: white;
-        border: none;
-        cursor: pointer;
-        transition: background-color 0.3s;
-    }
-    button:hover {
-        background-color: #554fb8; /* Slightly darker hover */
-    }
-
-    table {
-        width: 100%;
-        border-collapse: collapse;
-        margin-top: 20px;
-    }
-    table th, table td {
-        text-align: left;
-        padding: 10px;
-        border: 1px solid #dee2e6;
-    }
-    table th {
-        background-color: #6c63ff;
-        color: white;
-        font-weight: bold;
-    }
-    table tr:nth-child(even) {
-        background-color: #f8f9fa;
-    }
-
-    footer {
-        background-color: #343a40;
-        color: white;
-        text-align: center;
-        padding: 10px 0;
-        margin-top: 20px;
-    }
-    footer a {
-        color: #f8f9fa;
-        text-decoration: underline;
-        transition: color 0.3s;
-    }
-    footer a:hover {
-        color: #6c63ff; /* Accent color hover */
-    }
-
-    /* Responsiveness */
-    @media (max-width: 768px) {
-        .nav-menu ul {
-            flex-direction: column;
+        body {
+            font-family: 'Roboto', Arial, sans-serif;
+            margin: 0;
+            padding: 0;
+            background: blue; /* Light gray background for contrast */
+            color: #343a40; /* Dark gray text for readability */
         }
-        .nav-menu li {
-            margin: 10px 0;
+        header {
+            background-color: #6c63ff; /* Modern purple shade */
+            color: white;
+            padding: 20px 20px;
+            text-align: center;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1); /* Subtle shadow */
         }
-        .section {
+        header h1 {
+            font-size: 2.2rem;
+            margin: 0;
+        }
+        header p {
+            font-size: 1rem;
+            margin: 5px 0 0;
+        }
+
+        .nav-menu {
+            display: flex;
+            justify-content: center;
+            background-color: #495057; /* Neutral dark gray */
             padding: 15px;
         }
-        table {
-            font-size: 0.9rem;
+        .nav-menu ul {
+            list-style: none;
+            margin: 0;
+            padding: 0;
+            display: flex;
+            align-items: center;
         }
-    }
+        .nav-menu li {
+            margin: 0 15px;
+        }
+        .nav-menu a {
+            text-decoration: none;
+            color: white;
+            font-size: 1rem;
+            transition: color 0.3s, text-decoration 0.3s;
+        }
+        .nav-menu a:hover {
+            color: #f8f9fa; /* Slightly lighter for hover */
+            text-decoration: underline;
+        }
+
+        .section {
+            margin: 20px;
+            padding: 20px;
+            background: #ffffff; /* White cards for content */
+            border-radius: 10px;
+            box-shadow: 0 3px 8px rgba(0, 0, 0, 0.1); /* Subtle shadow for depth */
+        }
+        .section h2 {
+            font-size: 1.8rem;
+            color: #6c63ff; /* Accent color */
+            margin-bottom: 15px;
+        }
+
+        .timer, .auction-actions, .calculator {
+            text-align: center;
+        }
+        .timer p {
+            font-size: 1.2rem;
+            color: #495057;
+        }
+
+        input, select, button {
+            padding: 10px;
+            margin: 5px 0;
+            font-size: 1rem;
+            border: 1px solid #ced4da;
+            border-radius: 5px;
+        }
+        input:focus, select:focus {
+            outline: none;
+            border-color: #6c63ff; /* Highlight focus */
+            box-shadow: 0 0 5px rgba(108, 99, 255, 0.5);
+        }
+        button {
+            background-color: #6c63ff;
+            color: white;
+            border: none;
+            cursor: pointer;
+            transition: background-color 0.3s;
+        }
+        button:hover {
+            background-color: #554fb8; /* Slightly darker hover */
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 20px;
+        }
+        table th, table td {
+            text-align: left;
+            padding: 10px;
+            border: 1px solid #dee2e6;
+        }
+        table th {
+            background-color: #6c63ff;
+            color: white;
+            font-weight: bold;
+        }
+        table tr:nth-child(even) {
+            background-color: #f8f9fa;
+        }
+
+        footer {
+            background-color: #343a40;
+            color: white;
+            text-align: center;
+            padding: 10px 0;
+            margin-top: 20px;
+        }
+        footer a {
+            color: #f8f9fa;
+            text-decoration: underline;
+            transition: color 0.3s;
+        }
+        footer a:hover {
+            color: #6c63ff; /* Accent color hover */
+        }
+
+        /* Responsiveness */
+        @media (max-width: 768px) {
+            .nav-menu ul {
+                flex-direction: column;
+            }
+            .nav-menu li {
+                margin: 10px 0;
+            }
+            .section {
+                padding: 15px;
+            }
+            table {
+                font-size: 0.9rem;
+            }
+        }
+
+        /* Top buttons */
+.top-buttons {
+    display: flex;
+    justify-content: flex-end;
+    gap: 10px;
+    padding: 10px 20px;
+    background-color: #495057; /* Match nav background */
+}
+
+.top-buttons .button {
+    padding: 10px 20px;
+    font-size: 0.9rem;
+    text-decoration: none;
+    color: white;
+    background-color: #6c63ff; /* Button color */
+    border-radius: 5px;
+    transition: background-color 0.3s;
+}
+
+.top-buttons .button:hover {
+    background-color: #554fb8; /* Darker button hover */
+}
+
+.register-button {
+    background-color: #28a745; /* Green for Register */
+}
+
+.register-button:hover {
+    background-color: #218838; /* Darker green */
+}
+
+.login-button {
+    background-color: #17a2b8; /* Blue for Login */
+}
+
+.login-button:hover {
+    background-color: #117a8b; /* Darker blue */
+}
+
+
     </style>
 </head>
 <body>
     <header>
-        <h1>Live Auction</h1>
-        <p>Peer-to-Peer Investment Platform</p>
-        <nav id="navbar" class="nav-menu navbar">
+    <h1>Live Auction</h1>
+    <p>Peer-to-Peer Investment Platform</p>
+    <div class="top-buttons">
+        <a href="#register" class="button register-button">Register</a>
+        <a href="#login" class="button login-button">Login</a>
+    </div>
+    <nav id="navbar" class="nav-menu navbar">
             <ul>
-                <li><a href="#hero" class="nav-link scrollto active"><i class="bx bx-home"></i> <span>Home</span></a></li>
-                <li><a href="#about" class="nav-link scrollto"><i class="bx bx-user"></i> <span>About</span></a></li>
-                <li><a href="#instructions" class="nav-link scrollto"><i class="bx bx-file-blank"></i> <span>Instructions</span></a></li>
-                <li><a href="#auction-timer" class="nav-link scrollto"><i class="bx bx-book-content"></i> <span>Auction Timers</span></a></li>
-                <li><a href="#bidding" class="nav-link scrollto"><i class="bx bx-server"></i> <span>Bidding</span></a></li>
-                <li><a href="#contact" class="nav-link scrollto"><i class="bx bx-envelope"></i> <span>Contact</span></a></li>
+                <li><a href="#hero" class="nav-link scrollto active">Home</a></li>
+                <li><a href="#about" class="nav-link scrollto">About</a></li>
+                <li><a href="#instructions" class="nav-link scrollto">Instructions</a></li>
+                <li><a href="#profit-calculator" class="nav-link scrollto">Profit Calculator</a></li>
+                <li><a href="#bidding" class="nav-link scrollto">Bidding</a></li>
+                <li><a href="#contact" class="nav-link scrollto">Contact</a></li>
             </ul>
         </nav>
     </header>
 
-  <!-- Main Content -->
-   <main>
+    <main>
+        <!-- About Us Section -->
+        <section id="about" class="section">
+            <h2>About Us</h2>
+            <p>Welcome to Live Auction, the premier peer-to-peer investment platform. Join us to trade shares and grow your wealth!</p>
+            <p>You can invest for 4 days, 8 days, or 12 days with a 30%, 60%, and 95% Return on Investments (ROI) respectively.</p>
+        </section>
 
-    <!-- About Us Section -->
-    <section id="about" class="section">
-        <h2>About Us</h2>
-        <p>Welcome to Live Auction, the premier peer-to-peer investment platform. Join us to trade shares and grow your wealth!</p>
-        <p>You can invest for 4 days, 8 days, or 12 days with a 30%, 60%, and 95% Return on Investments (ROI) respectively. Feel free to select the duration of investment that suits you. The entire system depends on specific payment methods to operate.</p>
-    </section>
+        <!-- Instructions Section -->
+        <section id="instructions" class="section">
+            <h2>How It Works</h2>
+            <ol>
+                <li><strong>Create an account:</strong> Provide accurate Mpesa details.</li>
+                <li><strong>Understand auction times:</strong> Auction times are 9:00 AM, 1:00 PM, and 7:30 PM.</li>
+                <li><strong>Participate:</strong> Refresh the page when the timer reaches 00:00:00.</li>
+                <li><strong>Bid:</strong> Enter an amount (Minimum KES 500) and select an investment period.</li>
+                <li><strong>Check pairings:</strong> View Mpesa details under <strong>Bought Shares</strong>.</li>
+            </ol>
+        </section>
 
-    <!-- Instructions Section -->
-    <section id="instructions" class="section">
-        <h2>How It Works</h2>
-        <p>During any auction time, some people are selling shares, others are buying them, and each day new investors join the system. The Live Auction system operates based on demand and supply forces to ensure a long-term sustainable and profitable process.</p>
-        <h3>To Get Started:</h3>
-        <ol>
-            <li><strong>Create an account:</strong> Under the payment category, select <strong>Mpesa Safaricom PLC</strong> and provide accurate Mpesa details.</li>
-            <li><strong>Understand auction times:</strong> Auction times are 9:00 AM, 1:00 PM, and 7:30 PM. Timers on your dashboard will indicate the time remaining for each auction.</li>
-            <li><strong>Participate in auctions:</strong> Choose your session and refresh the page when the timer reaches 00:00:00 to access the bidding section.</li>
-            <li><strong>Bid:</strong> Enter your investment amount (Minimum KES 500), select an investment period (4 days, 8 days, or 12 days), and click <strong>Buy</strong>.</li>
-            <li><strong>Check pairings:</strong> Upon successful bidding, you'll be paired with sellers. Check their Mpesa details under <strong>Bought Shares</strong>.</li>        </ol>
-    </section>
-
-    <!-- Profit Calculator Section -->
-    <section id="calculator" class="section">
-        <h2>Profit Calculator</h2>
-        <div class="calculator">
+        <!-- Profit Calculator Section -->
+        <section id="calculator" class="section">
+            <h2>Profit Calculator</h2>
             <p>Enter your investment amount to calculate your profit:</p>
             <input type="number" id="investment" placeholder="Enter amount (KSH)">
             <label for="period">Select Investment Period:</label><br>
-            <select id="period" name="period" required>
+            <select id="period" required>
                 <option value="4">4 Days (30%)</option>
                 <option value="8">8 Days (60%)</option>
                 <option value="12">12 Days (95%)</option>
-            </select><br><br>
+            </select>
             <button onclick="calculateProfit()">Calculate</button>
             <p id="result"></p>
-        </div>
-        <script>
-            function calculateProfit() {
-                const investment = parseFloat(document.getElementById('investment').value);
-                const period = parseInt(document.getElementById('period').value);
+        </section>
 
-                if (isNaN(investment) || investment <= 0) {
-                    document.getElementById('result').textContent = "Please enter a valid investment amount.";
-                    return;
-                }
+        <!-- Contact Section -->
+        <section id="contact" class="section">
+            <h2>Contact Us</h2>
+            <p>For inquiries, contact <a href="mailto:support@liveauction.com">support@liveauction.com</a>.</p>
+        </section>
+    </main>
 
-                let profitRate;
-                switch (period) {
-                    case 4:
-                        profitRate = 0.3; // 30% for 4 days
-                        break;
-                    case 8:
-                        profitRate = 0.6; // 60% for 8 days
-                        break;
-                    case 12:
-                        profitRate = 0.95; // 95% for 12 days
-                        break;
-                    default:
-                        document.getElementById('result').textContent = "Invalid period selected.";
-                        return;
-                }
-
-                const profit = investment * profitRate;
-                const total = investment + profit;
-                document.getElementById('result').textContent = `For a ${period}-day investment: Your profit will be KSH ${profit.toFixed(2)}, for a total return of KSH ${total.toFixed(2)}.`;
-            }
-        </script>
-    </section>
-
-    <!-- Auction Timers Section -->
-    <section id="auction-timer" class="section">
-  <h2>Auction Timers</h2>
-  <div class="timer">
-    <p>Next Auction Time: <span id="timer"></span></p>
-  </div>
-  <script>
-    function updateTimer() {
-      // Auction time slots: start and end times
-      const auctionSlots = [
-        { start: "09:00:00", end: "10:00:00" },
-        { start: "13:00:00", end: "14:00:00" },
-        { start: "19:30:00", end: "20:30:00" },
-      ];
-
-      const now = new Date();
-      let nextSlot = null;
-
-      // Find the next auction slot
-      for (const slot of auctionSlots) {
-        const [startHours, startMinutes, startSeconds] = slot.start.split(":").map(Number);
-        const start = new Date();
-        start.setHours(startHours, startMinutes, startSeconds, 0);
-
-        if (now < start) {
-          nextSlot = { startTime: start, endTime: slot.end };
-          break;
-        }
-      }
-
-      // If no more slots today, set to the first slot tomorrow
-      if (!nextSlot) {
-        const [startHours, startMinutes, startSeconds] = auctionSlots[0].start.split(":").map(Number);
-        const tomorrow = new Date();
-        tomorrow.setDate(tomorrow.getDate() + 1);
-        tomorrow.setHours(startHours, startMinutes, startSeconds, 0);
-        nextSlot = { startTime: tomorrow, endTime: auctionSlots[0].end };
-      }
-
-      // Countdown logic
-      const interval = setInterval(() => {
-        const now = new Date();
-        const diff = nextSlot.startTime - now;
-
-        if (diff <= 0) {
-          // Auction time has started, calculate time remaining in the slot
-          const [endHours, endMinutes, endSeconds] = nextSlot.endTime.split(":").map(Number);
-          const end = new Date(nextSlot.startTime);
-          end.setHours(endHours, endMinutes, endSeconds);
-
-          if (now < end) {
-            document.getElementById("timer").textContent = "Auction ongoing! Ends at: " + nextSlot.endTime;
-          } else {
-            // Slot ended, reload to display next auction
-            clearInterval(interval);
-            document.getElementById("timer").textContent = "Auction Closed. Refresh for Next Slot.";
-          }
-          return;
-        }
-
-        // Update countdown for next auction
-        const hours = String(Math.floor(diff / (1000 * 60 * 60))).padStart(2, "0");
-        const minutes = String(Math.floor((diff % (1000 * 60 * 60)) / (1000 * 60))).padStart(2, "0");
-        const seconds = String(Math.floor((diff % (1000 * 60)) / 1000)).padStart(2, "0");
-
-        document.getElementById("timer").textContent = `${hours}:${minutes}:${seconds}`;
-      }, 1000);
-    }
-
-    updateTimer();
-  </script>
-</section>
-
-<!-- Bidding Section -->
-    <section id="bidding" class="section">
-    <h2>Bidding</h2>
-    <div class="auction-actions">
-        <form id="bid-form">
-            <label for="investment">Enter Amount (KES 500 - 100,000):</label><br>
-            <input type="number" id="investment" name="investment" min="500" max="1000000" required><br><br>
-
-            <label for="period">Select Investment Period:</label><br>
-            <select id="period" name="period" required>
-                <option value="4">4 Days (30% ROI)</option>
-                <option value="8">8 Days (60% ROI)</option>
-                <option value="12">12 Days (95% ROI)</option>
-            </select><br><br>
-
-            <button type="submit">Bid</button>
-        </form>
-    </div>
-    <script>
-
-        // Simulate user login status
-        const isLoggedIn = localStorage.getItem('isLoggedIn') === 'true'; // Check client-side login
-
-        const bidForm = document.getElementById("bid-form");
-        bidForm.addEventListener("submit", (e) => {
-            e.preventDefault();
-
-            // Check if user is logged in
-            if (!isLoggedIn) {
-                alert("Authentication required. Please login to continue.");
-                window.location.href = "login.html"; // Redirect to the login page
-                return;
-            }
-
-            const investment = parseFloat(document.getElementById("investment").value);
-            const period = document.getElementById("period").value;
-
-            // Validate investment amount
-            if (investment < 500 || investment > 100000) {
-                alert("Investment must be between KES 500 and KES 100,000.");
-                return;
-            }
-
-            alert(`Bid successful for KES ${investment}, for a ${period}-day period. You'll be logged out to allow others to bid.`);
-            window.location.reload();
-        });
-    </script>
-</section>
-
-<!-- ======= Bid Status Section ======= -->
-    <section id="bid-status" class="section">
-        <h2>Your Bid Status</h2>
-        <div id="bid-status-container">
-            <p>Loading your bid status...</p>
-        </div>
-    </section>
-
-<!-- Add script -->
-    <script>
-        // Fetch and display bid status
-        document.addEventListener("DOMContentLoaded", async () => {
-            const container = document.getElementById("bid-status-container");
-
-            try {
-                // Replace this URL with your API endpoint
-                const response = await fetch("http://localhost:5000/api/bid-status", {
-                    headers: {
-                        Authorization: `Bearer ${localStorage.getItem("token")}`, // Use token for authentication
-                    },
-                });
-
-                if (!response.ok) {
-                    throw new Error("Failed to fetch bid status. Please log in.");
-                }
-
-                const bidStatus = await response.json();
-
-                if (bidStatus.length === 0) {
-                    container.innerHTML = "<p>No bids found. Place a bid to see your status.</p>";
-                    return;
-                }
-
-                // Dynamically build the bid status table
-                let statusHTML = `
-                    <table>
-                        <thead>
-                            <tr>
-                                <th>Bid Amount</th>
-                                <th>Status</th>
-                                <th>Seller(s) Details</th>
-                                <th>Time Remaining</th>
-                                <th>Actions</th>
-                            </tr>
-                        </thead>
-                        <tbody>
-                `;
-
-                bidStatus.forEach(bid => {
-                    const sellerInfo = bid.sellers.length
-                        ? bid.sellers.map(seller => `
-                            <p>
-                                <strong>Mpesa Number:</strong> ${seller.phone}<br>
-                                <strong>Mpesa Name:</strong> ${seller.name}<br>
-                                <strong>Status:</strong> ${seller.status}<br>
-                            </p>
-                          `).join("")
-                        : "<p>The system will allocate you a seller within 24 hours.</p>";
-
-                    const timer = bid.timer
-                        ? `<p>${bid.timer} hours remaining</p>`
-                        : "<p>Activated</p>";
-
-                    const actions = bid.status === "paired" ? `
-                        <button onclick="confirmPayment('${bid.id}')">Confirm Payment</button>
-                    ` : "N/A";
-
-                    statusHTML += `
-                        <tr>
-                            <td>${bid.amount} KES</td>
-                            <td>${bid.status}</td>
-                            <td>${sellerInfo}</td>
-                            <td>${timer}</td>
-                            <td>${actions}</td>
-                        </tr>
-                    `;
-                });
-
-                statusHTML += "</tbody></table>";
-                container.innerHTML = statusHTML;
-
-            } catch (error) {
-                console.error("Error fetching bid status:", error);
-                container.innerHTML = `<p>${error.message}</p>`;
-            }
-        });
-
-        // Confirm payment for a specific bid
-        async function confirmPayment(bidId) {
-            try {
-                const response = await fetch(`http://localhost:5000/api/confirm-payment/${bidId}`, {
-                    method: "POST",
-                    headers: {
-                        "Content-Type": "application/json",
-                        Authorization: `Bearer ${localStorage.getItem("token")}`, // Use token for authentication
-                    },
-                });
-
-                if (!response.ok) {
-                    throw new Error("Failed to confirm payment.");
-                }
-
-                alert("Payment confirmed successfully!");
-                window.location.reload();
-            } catch (error) {
-                console.error("Error confirming payment:", error);
-                alert("Failed to confirm payment. Please try again.");
-            }
-        }
-    </script>
-</section>
-
-    <!-- Contact Section -->
-    <section id="contact" class="section">
-        <h2>Contact Us</h2>
-        <p>For more information or inquiries, please contact our support team at <a href="mailto:support@liveauction.com">support@liveauction.com</a>.</p>
-    </section>
-</main>
-
-<footer>
+    <footer>
         <p>&copy; 2025 Live Auction. All rights reserved.</p>
     </footer>
+
+    <script>
+        function calculateProfit() {
+            const investment = parseFloat(document.getElementById('investment').value);
+            const period = parseInt(document.getElementById('period').value);
+
+            if (isNaN(investment) || investment <= 0) {
+                document.getElementById('result').textContent = "Please enter a valid amount.";
+                return;
+            }
+
+            const rates = { 4: 0.3, 8: 0.6, 12: 0.95 };
+            const profitRate = rates[period];
+
+            const profit = investment * profitRate;
+            const total = investment + profit;
+            document.getElementById('result').textContent = `For ${period} days: Profit = KSH ${profit.toFixed(2)}, Total = KSH ${total.toFixed(2)}.`;
+        }
+    </script>
+
+    <script>
+    // Redirect when clicking Login or Register buttons
+    document.querySelector('.login-button').addEventListener('click', function (e) {
+        e.preventDefault(); // Prevent default behavior of anchor tags
+        window.location.href = 'login.html'; // Redirect to login.html
+    });
+
+    document.querySelector('.register-button').addEventListener('click', function (e) {
+        e.preventDefault(); // Prevent default behavior of anchor tags
+        window.location.href = 'register.html'; // Redirect to register.html
+    });
+</script>
 </body>
 </html>

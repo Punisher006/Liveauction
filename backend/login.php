@@ -1,42 +1,24 @@
 <?php
-session_start();
-include('db_config.php');
-include('functions.php');
+header('Content-Type: application/json');
 
-if ($_SERVER["REQUEST_METHOD"] == "POST") {
-    $username = sanitizeInput($_POST['username'], $conn);
-    $password = $_POST['password'];
+// Simulated database validation
+$validUsername = 'admin';
+$validPassword = 'password';
 
-    // Query to check if user exists
-    $loginQuery = "SELECT * FROM users WHERE username = ?";
-    $stmt = $conn->prepare($loginQuery);
-    $stmt->bind_param("s", $username);
-    $stmt->execute();
-    $result = $stmt->get_result();
+// Check if the request is POST
+if ($_SERVER['REQUEST_METHOD'] === 'POST') {
+    $username = $_POST['username'] ?? '';
+    $password = $_POST['password'] ?? '';
 
-    if ($result->num_rows == 1) {
-        $user = $result->fetch_assoc();
-        
-        // Verify the password
-        if (verifyPassword($password, $user['password'])) {
-            $_SESSION['user_id'] = $user['id'];
-            $_SESSION['username'] = $user['username'];
-            echo "Login successful!";
-            header("Location: home.php"); // Redirect to home page
-            exit;
-        } else {
-            echo "Invalid password.";
-        }
+    // Validate credentials
+    if ($username === $validUsername && $password === $validPassword) {
+        echo json_encode(['success' => true]);
     } else {
-        echo "No user found with that username.";
+        echo json_encode(['success' => false, 'message' => 'Invalid username or password.']);
     }
-
-    $stmt->close();
+} else {
+    // Redirect to the login page for non-AJAX requests
+    header('Location: login.html');
+    exit;
 }
 ?>
-
-<form method="POST" action="login.php">
-    <input type="text" name="username" placeholder="Username" required>
-    <input type="password" name="password" placeholder="Password" required>
-    <button type="submit">Login</button>
-</form>

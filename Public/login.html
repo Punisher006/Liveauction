@@ -127,23 +127,23 @@ body {
     }
     </style>
 </head>
-<body>
 
+<body>
     <div class="wrapper">
-        <form action="login.php" method="POST"></form>
+        <form action="login.php" method="POST">
             <h1>Login</h1>
             <div class="input-box">
-                <input type="text" placeholder="Username" id="username" required>
+                <input type="text" name="username" placeholder="Username" id="username" required>
                 <i class='bx bxs-user'></i>
             </div>
             <div class="input-box">
-                <input type="password" placeholder="Password" id="password" required>
+                <input type="password" name="password" placeholder="Password" id="password" required>
                 <i class='bx bxs-lock-alt'></i>
             </div>
 
             <div class="remember-forgot">
-                <label><input type="checkbox"> Remember me</label>
-                <a href="#">Forgot Password</a>
+                <label><input type="checkbox" name="remember"> Remember me</label>
+                <a href="reset_password.html">Forgot Password</a>
             </div>
 
             <button type="submit" class="btn">Login</button>
@@ -152,6 +152,47 @@ body {
                 <p>Don't have an account? <a href="register.html">Register</a></p>
             </div>
         </form>
-        <div></div>
-           
-    </div>
+
+    <script>
+        document.getElementById('loginForm').addEventListener('submit', function (event) {
+            event.preventDefault(); // Prevent the form from refreshing the page
+
+            const username = document.getElementById('username').value.trim();
+            const password = document.getElementById('password').value.trim();
+            const errorMessage = document.getElementById('errorMessage');
+
+            // Validate inputs
+            if (!username || !password) {
+                errorMessage.textContent = 'Please fill in all fields.';
+                return;
+            }
+
+            // Prepare data for the backend
+            const formData = new FormData();
+            formData.append('username', username);
+            formData.append('password', password);
+
+            // Send login request to the backend
+            fetch('login.php', {
+                method: 'POST',
+                body: formData
+            })
+                .then(response => response.json())
+                .then(data => {
+                    console.log(data);
+                    if (data.success) {
+                        // Redirect to home.html on success
+                        window.location.href = 'home.html';
+                    } else {
+                        // Display error message
+                        errorMessage.textContent = data.message || 'Invalid username or password.';
+                    }
+                })
+                .catch(error => {
+                    console.error('Error:', error);
+                    errorMessage.textContent = 'An error occurred. Please try again later.';
+                });
+        });
+    </script>
+</body>
+</html>
