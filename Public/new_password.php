@@ -1,6 +1,6 @@
 <?php
-include('db_config.php');
-include('functions.php');
+require_once('db_config.php');
+require_once('functions.php');
 
 if ($_SERVER["REQUEST_METHOD"] == "POST") {
     $reset_token = $_POST['token'];

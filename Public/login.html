@@ -143,7 +143,7 @@ body {
 
             <div class="remember-forgot">
                 <label><input type="checkbox" name="remember"> Remember me</label>
-                <a href="reset_password.html">Forgot Password</a>
+                <a href="forgot_password.html">Forgot Password</a>
             </div>
 
             <button type="submit" class="btn">Login</button>
@@ -152,47 +152,37 @@ body {
                 <p>Don't have an account? <a href="register.html">Register</a></p>
             </div>
         </form>
+    </div>
 
     <script>
-        document.getElementById('loginForm').addEventListener('submit', function (event) {
-            event.preventDefault(); // Prevent the form from refreshing the page
+        document.getElementById("loginForm").addEventListener("submit", function(event) {
+            event.preventDefault(); // Prevent default form submission
 
-            const username = document.getElementById('username').value.trim();
-            const password = document.getElementById('password').value.trim();
-            const errorMessage = document.getElementById('errorMessage');
+            var username = document.getElementById("username").value;
+            var password = document.getElementById("password").value;
+            var remember = document.querySelector("input[name='remember']").checked;
 
-            // Validate inputs
-            if (!username || !password) {
-                errorMessage.textContent = 'Please fill in all fields.';
-                return;
-            }
+            var formData = new FormData();
+            formData.append("username", username);
+            formData.append("password", password);
+            formData.append("remember", remember);
 
-            // Prepare data for the backend
-            const formData = new FormData();
-            formData.append('username', username);
-            formData.append('password', password);
-
-            // Send login request to the backend
+            // AJAX request
             fetch('login.php', {
                 method: 'POST',
                 body: formData
             })
-                .then(response => response.json())
-                .then(data => {
-                    console.log(data);
-                    if (data.success) {
-                        // Redirect to home.html on success
-                        window.location.href = 'home.html';
-                    } else {
-                        // Display error message
-                        errorMessage.textContent = data.message || 'Invalid username or password.';
-                    }
-                })
-                .catch(error => {
-                    console.error('Error:', error);
-                    errorMessage.textContent = 'An error occurred. Please try again later.';
-                });
+            .then(response => response.json())
+            .then(data => {
+                if (data.success) {
+                    window.location.href = 'home.php'; // Redirect to dashboard
+                } else {
+                    alert(data.message); // Show error message
+                }
+            })
+            .catch(error => console.error('Error:', error));
         });
     </script>
 </body>
+
 </html>

@@ -1,0 +1,10 @@
+module.exports = {
+  // Windows (XAMPP default)
+  php: "C:\\xampp\\php\\php.exe",
+  
+  // Optional settings:
+  open: true,               // Auto-open browser
+  port: 5500,               // Default port
+  root: "./public",         // Change if your files are in a subfolder
+  watch: ["*.php", "*.html", "*.css", "*.js"] // Files to watch for changes
+}
