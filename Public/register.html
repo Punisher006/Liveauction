@@ -29,7 +29,7 @@
 
         .wrapper {
             width: 420px;
-            background: blue;
+            background: purple;
             color: #fff;
             border-radius: 10px;
             padding: 30px 40px;
@@ -110,22 +110,22 @@
 <body>
 
     <div class="wrapper">
-        <form id="registerForm" action="register.php" method="POST">
+        <form action="register.php" method="POST"></form>
             <h1>Register</h1>
             <div class="input-box">
-                <input type="text" name="username" id="username" placeholder="Username" required>
+                <input type="text" placeholder="Username" id="username" required>
                 <i class='bx bxs-user'></i>
             </div>
-            <div ass="input-box">
-                <input type="email" name="email" id="email" placeholder="Email" required>
+            <div class="input-box">
+                <input type="email" placeholder="Email" id="email" required>
                 <i class='bx bxs-envelope'></i>
             </div>
             <div class="input-box">
-                <input type="password" name="password_1" id="password" placeholder="Password" required>
+                <input type="password" placeholder="Password" id="password" required>
                 <i class='bx bxs-lock-alt'></i>
             </div>
             <div class="input-box">
-                <input type="password" name="password_2" id="confirm-password" placeholder="Confirm Password" required>
+                <input type="password" placeholder="Confirm Password" id="confirm-password" required>
                 <i class='bx bxs-lock-alt'></i>
             </div>
 
@@ -138,36 +138,40 @@
     </div>
 
     <script>
-    
-          // Clear previous messages
-          const errorMessage = document.getElementById("error-message");
-          const successMessage = document.getElementById("success-message");
-          errorMessage.textContent = "";
-          successMessage.textContent = "";
-    
-          const formData = new FormData(this);
-    
-          try {
-            const response = await fetch("register.php", {
-              method: "POST",
-              body: formData,
-            });
-    
-            const result = await response.text();
-    
-            if (result === "success") {
-              successMessage.textContent = "Registration successful! Redirecting...";
-              setTimeout(() => {
-                window.location.href = "home.html";
-              }, 2000);
-            } else {
-              errorMessage.textContent = result;
+        document.getElementById('registerForm').addEventListener('submit', function(event) {
+            event.preventDefault();
+
+            const username = document.getElementById('username').value;
+            const email = document.getElementById('email').value;
+            const password = document.getElementById('password').value;
+            const confirmPassword = document.getElementById('confirm-password').value;
+
+            const strongPasswordRegex = /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[@$!%*?&#])[A-Za-z\d@$!%*?&#]{8,}$/;
+
+            // Validate password strength
+            if (!strongPasswordRegex.test(password)) {
+                alert('Password must be at least 8 characters long, contain an uppercase letter, a lowercase letter, a number, and a special character.');
+                return;
             }
-    
-          } catch (err) {
-            errorMessage.textContent = "Something went wrong. Please try again.";
-            console.error("Error:", err);
-          }
-      </script>
-    </body>
-    </html> 
+
+            // Check if passwords match
+            if (password !== confirmPassword) {
+                alert('Passwords do not match.');
+                return;
+            }
+
+            // Mock check for existing username or email (replace with actual validation if necessary)
+            const existingUsers = ['testuser', 'example@example.com'];
+            if (existingUsers.includes(username) || existingUsers.includes(email)) {
+                alert('Username or email is already in use.');
+                return;
+            }
+
+            // If all validations pass
+            alert('Registration successful!');
+        });
+    </script>
+
+</body>
+
+</html>
