@@ -1,0 +1,315 @@
+/* General styling */
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
+body {
+    font-family: 'Roboto', Arial, sans-serif;
+    margin: 0;
+    padding: 0;
+    background: #f8f9fa; /* Light gray background for contrast */
+    color: #343a40; /* Dark gray text for readability */
+    line-height: 1.6;
+}
+
+header {
+    background-color: #6c63ff; /* Modern purple shade */
+    color: white;
+    padding: 20px 20px;
+    text-align: center;
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1); /* Subtle shadow */
+    position: relative;
+}
+
+header h1 {
+    font-size: 2.2rem;
+    margin: 0;
+}
+
+header p {
+    font-size: 1rem;
+    margin: 5px 0 0;
+}
+
+.nav-menu {
+    display: flex;
+    justify-content: center;
+    background-color: #495057; /* Neutral dark gray */
+    padding: 15px;
+    margin-top: 15px;
+}
+
+.nav-menu ul {
+    list-style: none;
+    margin: 0;
+    padding: 0;
+    display: flex;
+    align-items: center;
+    flex-wrap: wrap;
+}
+
+.nav-menu li {
+    margin: 0 15px;
+}
+
+.nav-menu a {
+    text-decoration: none;
+    color: white;
+    font-size: 1rem;
+    transition: color 0.3s, text-decoration 0.3s;
+    padding: 5px 10px;
+    border-radius: 3px;
+}
+
+.nav-menu a:hover {
+    color: #f8f9fa; /* Slightly lighter for hover */
+    text-decoration: underline;
+    background-color: rgba(255, 255, 255, 0.1);
+}
+
+.section {
+    margin: 20px;
+    padding: 20px;
+    background: #ffffff; /* White cards for content */
+    border-radius: 10px;
+    box-shadow: 0 3px 8px rgba(0, 0, 0, 0.1); /* Subtle shadow for depth */
+}
+
+.section h2 {
+    font-size: 1.8rem;
+    color: #6c63ff; /* Accent color */
+    margin-bottom: 15px;
+    border-bottom: 2px solid #6c63ff;
+    padding-bottom: 10px;
+}
+
+.timer, .auction-actions, .calculator {
+    text-align: center;
+}
+
+.timer p {
+    font-size: 1.2rem;
+    color: #495057;
+}
+
+input, select, button {
+    padding: 10px;
+    margin: 5px 0;
+    font-size: 1rem;
+    border: 1px solid #ced4da;
+    border-radius: 5px;
+    width: 100%;
+    max-width: 300px;
+}
+
+input:focus, select:focus {
+    outline: none;
+    border-color: #6c63ff; /* Highlight focus */
+    box-shadow: 0 0 5px rgba(108, 99, 255, 0.5);
+}
+
+button {
+    background-color: #6c63ff;
+    color: white;
+    border: none;
+    cursor: pointer;
+    transition: background-color 0.3s;
+    padding: 12px 20px;
+}
+
+button:hover {
+    background-color: #554fb8; /* Slightly darker hover */
+}
+
+table {
+    width: 100%;
+    border-collapse: collapse;
+    margin-top: 20px;
+}
+
+table th, table td {
+    text-align: left;
+    padding: 12px;
+    border: 1px solid #dee2e6;
+}
+
+table th {
+    background-color: #6c63ff;
+    color: white;
+    font-weight: bold;
+}
+
+table tr:nth-child(even) {
+    background-color: #f8f9fa;
+}
+
+footer {
+    background-color: #343a40;
+    color: white;
+    text-align: center;
+    padding: 20px 0;
+    margin-top: 20px;
+}
+
+footer a {
+    color: #f8f9fa;
+    text-decoration: underline;
+    transition: color 0.3s;
+}
+
+footer a:hover {
+    color: #6c63ff; /* Accent color hover */
+}
+
+/* Top buttons */
+.top-buttons {
+    display: flex;
+    justify-content: center;
+    gap: 15px;
+    padding: 15px 20px;
+    background-color: #495057; /* Match nav background */
+    flex-wrap: wrap;
+}
+
+.top-buttons .button {
+    padding: 12px 25px;
+    font-size: 1rem;
+    text-decoration: none;
+    color: white;
+    background-color: #6c63ff; /* Button color */
+    border-radius: 5px;
+    transition: background-color 0.3s;
+    text-align: center;
+    min-width: 120px;
+}
+
+.top-buttons .button:hover {
+    background-color: #554fb8; /* Darker button hover */
+    text-decoration: none;
+}
+
+.register-button {
+    background-color: #28a745; /* Green for Register */
+}
+
+.register-button:hover {
+    background-color: #218838; /* Darker green */
+}
+
+.login-button {
+    background-color: #17a2b8; /* Blue for Login */
+}
+
+.login-button:hover {
+    background-color: #117a8b; /* Darker blue */
+}
+
+/* Auth forms */
+.auth-section {
+    max-width: 500px;
+    margin: 40px auto;
+}
+
+.form-group {
+    margin-bottom: 20px;
+}
+
+.form-group label {
+    display: block;
+    margin-bottom: 5px;
+    font-weight: bold;
+    color: #495057;
+}
+
+.auth-button {
+    width: 100%;
+    padding: 12px;
+    font-size: 1.1rem;
+}
+
+/* Logout section */
+#logout-section {
+    text-align: center;
+    margin: 20px 0;
+}
+
+#logout-button {
+    background-color: #ff6b6b;
+    color: white;
+    padding: 12px 25px;
+    font-size: 1rem;
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
+    transition: background-color 0.3s ease-in-out;
+    width: auto;
+}
+
+#logout-button:hover {
+    background-color: #e63946;
+}
+
+#logout-button:focus {
+    outline: none;
+    box-shadow: 0 0 5px rgba(230, 57, 70, 0.5);
+}
+
+/* Instructions */
+ol {
+    padding-left: 20px;
+}
+
+ol li {
+    margin-bottom: 10px;
+    padding-left: 10px;
+}
+
+/* Responsiveness */
+@media (max-width: 768px) {
+    .nav-menu ul {
+        flex-direction: column;
+    }
+    
+    .nav-menu li {
+        margin: 8px 0;
+    }
+    
+    .section {
+        padding: 15px;
+        margin: 10px;
+    }
+    
+    table {
+        font-size: 0.9rem;
+    }
+    
+    .top-buttons {
+        flex-direction: column;
+        align-items: center;
+    }
+    
+    .top-buttons .button {
+        width: 200px;
+    }
+    
+    header h1 {
+        font-size: 1.8rem;
+    }
+    
+    .section h2 {
+        font-size: 1.5rem;
+    }
+}
+
+@media (max-width: 480px) {
+    input, select, button {
+        width: 100%;
+    }
+    
+    table {
+        display: block;
+        overflow-x: auto;
+    }
+}

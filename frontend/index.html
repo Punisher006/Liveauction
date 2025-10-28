@@ -1,0 +1,92 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Live Auction - Peer-to-Peer Investment</title>
+    <link rel="stylesheet" href="css/style.css">
+</head>
+<body>
+    <header>
+        <h1>Live Auction</h1>
+        <p>Peer-to-Peer Investment Platform</p>
+        <div class="top-buttons">
+            <a href="register.html" class="button register-button">Register</a>
+            <a href="login.html" class="button login-button">Login</a>
+        </div>
+        <nav id="navbar" class="nav-menu navbar">
+            <ul>
+                <li><a href="#about" class="nav-link scrollto">About</a></li>
+                <li><a href="#instructions" class="nav-link scrollto">Instructions</a></li>
+                <li><a href="#calculator" class="nav-link scrollto">Profit Calculator</a></li>
+                <li><a href="#contact" class="nav-link scrollto">Contact</a></li>
+            </ul>
+        </nav>
+    </header>
+
+    <main>
+        <!-- About Us Section -->
+        <section id="about" class="section">
+            <h2>About Us</h2>
+            <p>Welcome to Live Auction, the premier peer-to-peer investment platform. Join us to trade shares and grow your wealth!</p>
+            <p>You can invest for 4 days, 8 days, or 12 days with a 30%, 60%, and 95% Return on Investments (ROI) respectively.</p>
+        </section>
+
+        <!-- Instructions Section -->
+        <section id="instructions" class="section">
+            <h2>How It Works</h2>
+            <ol>
+                <li><strong>Create an account:</strong> Provide accurate Mpesa details.</li>
+                <li><strong>Understand auction times:</strong> Auction times are 9:00 AM, 1:00 PM, and 7:30 PM.</li>
+                <li><strong>Participate:</strong> Refresh the page when the timer reaches 00:00:00.</li>
+                <li><strong>Bid:</strong> Enter an amount (Minimum KES 500) and select an investment period.</li>
+                <li><strong>Check pairings:</strong> View Mpesa details under <strong>Bought Shares</strong>.</li>
+            </ol>
+        </section>
+
+        <!-- Profit Calculator Section -->
+        <section id="calculator" class="section">
+            <h2>Profit Calculator</h2>
+            <p>Enter your investment amount to calculate your profit:</p>
+            <input type="number" id="investment" placeholder="Enter amount (KSH)">
+            <label for="period">Select Investment Period:</label><br>
+            <select id="period" required>
+                <option value="4">4 Days (30%)</option>
+                <option value="8">8 Days (60%)</option>
+                <option value="12">12 Days (95%)</option>
+            </select>
+            <button onclick="calculateProfit()">Calculate</button>
+            <p id="result"></p>
+        </section>
+
+        <!-- Contact Section -->
+        <section id="contact" class="section">
+            <h2>Contact Us</h2>
+            <p>For inquiries, contact <a href="mailto:support@liveauction.com">support@liveauction.com</a>.</p>
+        </section>
+    </main>
+
+    <footer>
+        <p>&copy; 2025 Live Auction. All rights reserved.</p>
+    </footer>
+
+    <script>
+        function calculateProfit() {
+            const investment = parseFloat(document.getElementById('investment').value);
+            const period = parseInt(document.getElementById('period').value);
+
+            if (isNaN(investment) || investment <= 0) {
+                document.getElementById('result').textContent = "Please enter a valid amount.";
+                return;
+            }
+
+            const rates = { 4: 0.3, 8: 0.6, 12: 0.95 };
+            const profitRate = rates[period];
+
+            const profit = investment * profitRate;
+            const total = investment + profit;
+            document.getElementById('result').textContent = `For ${period} days: Profit = KSH ${profit.toFixed(2)}, Total = KSH ${total.toFixed(2)}.`;
+        }
+    </script>
+</body>
+</html>
