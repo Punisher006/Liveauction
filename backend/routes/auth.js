@@ -6,30 +6,37 @@ const auth = require('../middleware/auth');
 const router = express.Router();
 const JWT_SECRET = process.env.JWT_SECRET || 'your_jwt_secret_key';
 
-// Register
+// Register user
 router.post('/register', async (req, res) => {
     try {
         const { fullName, email, phone, password } = req.body;
 
-        // Check if user exists
-        let user = await User.findOne({ email });
-        if (user) {
-            return res.status(400).json({ message: 'User already exists' });
+        // Validate input
+        if (!fullName || !email || !phone || !password) {
+            return res.status(400).json({ message: 'All fields are required' });
         }
 
-        // Create new user
-        user = new User({
+        // Check if user exists
+        const existingUser = await User.findByEmail(email);
+        if (existingUser) {
+            return res.status(400).json({ message: 'User already exists with this email' });
+        }
+
+        // Create user
+        const userId = await User.create({
             fullName,
             email,
             phone,
-            password
+            password,
+            mpesaName: fullName
         });
 
-        await user.save();
+        // Get created user
+        const user = await User.findById(userId);
 
         // Create token
         const token = jwt.sign(
-            { userId: user._id },
+            { userId: user.id },
             JWT_SECRET,
             { expiresIn: '24h' }
         );
@@ -38,8 +45,8 @@ router.post('/register', async (req, res) => {
             message: 'User registered successfully',
             token,
             user: {
-                id: user._id,
-                fullName: user.fullName,
+                id: user.id,
+                fullName: user.full_name,
                 email: user.email,
                 phone: user.phone
             }
@@ -50,26 +57,34 @@ router.post('/register', async (req, res) => {
     }
 });
 
-// Login
+// Login user
 router.post('/login', async (req, res) => {
     try {
         const { email, password } = req.body;
 
+        // Validate input
+        if (!email || !password) {
+            return res.status(400).json({ message: 'Email and password are required' });
+        }
+
         // Find user
-        const user = await User.findOne({ email });
+        const user = await User.findByEmail(email);
         if (!user) {
             return res.status(400).json({ message: 'Invalid credentials' });
         }
 
         // Check password
-        const isMatch = await user.comparePassword(password);
+        const isMatch = await User.comparePassword(password, user.password_hash);
         if (!isMatch) {
             return res.status(400).json({ message: 'Invalid credentials' });
         }
 
+        // Update last login
+        await User.updateLastLogin(user.id);
+
         // Create token
         const token = jwt.sign(
-            { userId: user._id },
+            { userId: user.id },
             JWT_SECRET,
             { expiresIn: '24h' }
         );
@@ -78,10 +93,11 @@ router.post('/login', async (req, res) => {
             message: 'Login successful',
             token,
             user: {
-                id: user._id,
-                fullName: user.fullName,
+                id: user.id,
+                fullName: user.full_name,
                 email: user.email,
-                phone: user.phone
+                phone: user.phone,
+                balance: user.balance
             }
         });
     } catch (error) {
@@ -92,15 +108,37 @@ router.post('/login', async (req, res) => {
 
 // Get current user
 router.get('/me', auth, async (req, res) => {
-    res.json({
-        user: {
-            id: req.user._id,
-            fullName: req.user.fullName,
-            email: req.user.email,
-            phone: req.user.phone,
-            balance: req.user.balance
+    try {
+        const user = await User.findById(req.user.id);
+        if (!user) {
+            return res.status(404).json({ message: 'User not found' });
         }
-    });
+
+        // Get user statistics
+        const stats = await User.getUserStats(req.user.id);
+
+        res.json({
+            user: {
+                id: user.id,
+                fullName: user.full_name,
+                email: user.email,
+                phone: user.phone,
+                mpesaName: user.mpesa_name,
+                balance: user.balance,
+                accountStatus: user.account_status,
+                verificationStatus: user.verification_status,
+                createdAt: user.created_at
+            },
+            stats: {
+                totalBids: stats.total_bids || 0,
+                totalInvested: stats.total_invested || 0,
+                totalEarned: stats.total_earned || 0
+            }
+        });
+    } catch (error) {
+        console.error('Get user error:', error);
+        res.status(500).json({ message: 'Server error fetching user data' });
+    }
 });
 
 module.exports = router;

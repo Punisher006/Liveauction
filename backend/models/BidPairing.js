@@ -1,56 +1,66 @@
-const mongoose = require('mongoose');
+const { pool } = require('../config/database');
 
-const bidPairingSchema = new mongoose.Schema({
-    bidId: {
-        type: mongoose.Schema.Types.ObjectId,
-        ref: 'Bid',
-        required: true
-    },
-    sellerId: {
-        type: mongoose.Schema.Types.ObjectId,
-        ref: 'User',
-        required: true
-    },
-    buyerId: {
-        type: mongoose.Schema.Types.ObjectId,
-        ref: 'User',
-        required: true
-    },
-    amount: {
-        type: Number,
-        required: true
-    },
-    sellerPhone: {
-        type: String,
-        required: true
-    },
-    sellerMpesaName: {
-        type: String,
-        required: true
-    },
-    paymentStatus: {
-        type: String,
-        enum: ['pending', 'paid', 'confirmed', 'disputed'],
-        default: 'pending'
-    },
-    paymentDeadline: {
-        type: Date,
-        required: true
-    },
-    paidAt: {
-        type: Date
-    },
-    confirmedAt: {
-        type: Date
+class BidPairing {
+    // Create bid pairing
+    static async create(pairingData) {
+        const { bidId, sellerId, buyerId, amount, sellerPhone, sellerMpesaName } = pairingData;
+        
+        const sql = `
+            INSERT INTO bid_pairings (bid_id, seller_id, buyer_id, amount, seller_phone, seller_mpesa_name, payment_deadline) 
+            VALUES (?, ?, ?, ?, ?, ?, DATE_ADD(NOW(), INTERVAL 24 HOUR))
+        `;
+        
+        const [result] = await pool.execute(sql, [bidId, sellerId, buyerId, amount, sellerPhone, sellerMpesaName]);
+        return result.insertId;
     }
-}, {
-    timestamps: true
-});
 
-// Update related bid status when pairing is created
-bidPairingSchema.post('save', async function() {
-    const Bid = mongoose.model('Bid');
-    await Bid.findByIdAndUpdate(this.bidId, { status: 'paired' });
-});
+    // Get pairings for bid
+    static async findByBidId(bidId) {
+        const sql = `
+            SELECT 
+                bp.*,
+                u_seller.full_name as seller_name,
+                u_buyer.full_name as buyer_name
+            FROM bid_pairings bp
+            JOIN users u_seller ON bp.seller_id = u_seller.id
+            JOIN users u_buyer ON bp.buyer_id = u_buyer.id
+            WHERE bp.bid_id = ?
+        `;
+        const [rows] = await pool.execute(sql, [bidId]);
+        return rows;
+    }
 
-module.exports = mongoose.model('BidPairing', bidPairingSchema);
+    // Get pairings for user
+    static async findByUserId(userId) {
+        const sql = `
+            SELECT 
+                bp.*,
+                b.amount as bid_amount,
+                b.investment_period,
+                u_seller.full_name as seller_name,
+                u_buyer.full_name as buyer_name
+            FROM bid_pairings bp
+            JOIN bids b ON bp.bid_id = b.id
+            JOIN users u_seller ON bp.seller_id = u_seller.id
+            JOIN users u_buyer ON bp.buyer_id = u_buyer.id
+            WHERE bp.seller_id = ? OR bp.buyer_id = ?
+            ORDER BY bp.created_at DESC
+        `;
+        const [rows] = await pool.execute(sql, [userId, userId]);
+        return rows;
+    }
+
+    // Update payment status
+    static async updatePaymentStatus(pairingId, status) {
+        const sql = `
+            UPDATE bid_pairings 
+            SET payment_status = ?, 
+                paid_at = CASE WHEN status = 'paid' THEN NOW() ELSE paid_at END,
+                confirmed_at = CASE WHEN status = 'confirmed' THEN NOW() ELSE confirmed_at END
+            WHERE id = ?
+        `;
+        await pool.execute(sql, [status, pairingId]);
+    }
+}
+
+module.exports = BidPairing;

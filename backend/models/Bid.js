@@ -1,79 +1,95 @@
-const mongoose = require('mongoose');
+const { pool } = require('../config/database');
 
-const bidSchema = new mongoose.Schema({
-    userId: {
-        type: mongoose.Schema.Types.ObjectId,
-        ref: 'User',
-        required: true
-    },
-    auctionSessionId: {
-        type: mongoose.Schema.Types.ObjectId,
-        ref: 'AuctionSession',
-        required: true
-    },
-    amount: {
-        type: Number,
-        required: true,
-        min: 500,
-        max: 100000
-    },
-    investmentPeriod: {
-        type: Number,
-        required: true,
-        enum: [4, 8, 12]
-    },
-    expectedROI: {
-        type: Number,
-        required: true
-    },
-    expectedReturn: {
-        type: Number,
-        required: true
-    },
-    status: {
-        type: String,
-        enum: ['pending', 'paired', 'paid', 'completed', 'cancelled', 'expired'],
-        default: 'pending'
-    },
-    bidDate: {
-        type: Date,
-        default: Date.now
-    },
-    bidTime: {
-        type: String, // Store as "HH:MM:SS"
-        required: true
-    },
-    paymentDeadline: {
-        type: Date
-    },
-    completedAt: {
-        type: Date
+class Bid {
+    // Create new bid
+    static async create(bidData) {
+        const { userId, auctionSessionId, amount, investmentPeriod } = bidData;
+        
+        const roiRates = { 4: 0.3, 8: 0.6, 12: 0.95 };
+        const expectedROI = roiRates[investmentPeriod] * 100;
+        const expectedReturn = amount + (amount * roiRates[investmentPeriod]);
+        
+        const sql = `
+            INSERT INTO bids (user_id, auction_session_id, amount, investment_period, expected_roi, expected_return, bid_date, bid_time, payment_deadline) 
+            VALUES (?, ?, ?, ?, ?, ?, CURDATE(), TIME(NOW()), DATE_ADD(NOW(), INTERVAL 24 HOUR))
+        `;
+        
+        const [result] = await pool.execute(sql, [
+            userId, 
+            auctionSessionId, 
+            amount, 
+            investmentPeriod, 
+            expectedROI, 
+            expectedReturn
+        ]);
+        
+        return result.insertId;
     }
-}, {
-    timestamps: true
-});
 
-// Calculate expected return and ROI before saving
-bidSchema.pre('save', function(next) {
-    const roiRates = { 4: 0.3, 8: 0.6, 12: 0.95 };
-    this.expectedROI = roiRates[this.investmentPeriod] * 100;
-    this.expectedReturn = this.amount + (this.amount * roiRates[this.investmentPeriod]);
-    
-    // Set payment deadline (24 hours from creation)
-    if (this.isNew) {
-        this.paymentDeadline = new Date(Date.now() + 24 * 60 * 60 * 1000);
+    // Get user bids with session details
+    static async findByUserId(userId) {
+        const sql = `
+            SELECT 
+                b.*, 
+                s.session_name,
+                s.start_time,
+                s.end_time,
+                TIMEDIFF(s.end_time, TIME(NOW())) as time_remaining
+            FROM bids b 
+            JOIN auction_sessions s ON b.auction_session_id = s.id 
+            WHERE b.user_id = ? 
+            ORDER BY b.created_at DESC
+        `;
+        
+        const [rows] = await pool.execute(sql, [userId]);
+        return rows;
     }
-    
-    next();
-});
 
-// Update bid status based on payment deadline
-bidSchema.methods.checkPaymentStatus = function() {
-    if (this.status === 'paired' && this.paymentDeadline < new Date()) {
-        this.status = 'expired';
-        return this.save();
+    // Get bid by ID with details
+    static async findById(bidId) {
+        const sql = `
+            SELECT 
+                b.*,
+                u.full_name as user_name,
+                u.phone as user_phone,
+                s.session_name
+            FROM bids b
+            JOIN users u ON b.user_id = u.id
+            JOIN auction_sessions s ON b.auction_session_id = s.id
+            WHERE b.id = ?
+        `;
+        const [rows] = await pool.execute(sql, [bidId]);
+        return rows[0];
     }
-    return Promise.resolve(this);
-};
 
-module.exports = mongoose.model('Bid', bidSchema);
+    // Update bid status
+    static async updateStatus(bidId, status) {
+        const sql = 'UPDATE bids SET status = ?, updated_at = NOW() WHERE id = ?';
+        await pool.execute(sql, [status, bidId]);
+    }
+
+    // Get active bids for auction session
+    static async getActiveBidsForSession(sessionId) {
+        const sql = `
+            SELECT b.*, u.full_name, u.phone 
+            FROM bids b 
+            JOIN users u ON b.user_id = u.id 
+            WHERE b.auction_session_id = ? AND b.status IN ('pending', 'paired')
+        `;
+        const [rows] = await pool.execute(sql, [sessionId]);
+        return rows;
+    }
+
+    // Check if user has active bid
+    static async hasActiveBid(userId) {
+        const sql = `
+            SELECT COUNT(*) as count 
+            FROM bids 
+            WHERE user_id = ? AND status IN ('pending', 'paired')
+        `;
+        const [rows] = await pool.execute(sql, [userId]);
+        return rows[0].count > 0;
+    }
+}
+
+module.exports = Bid;

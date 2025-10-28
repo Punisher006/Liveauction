@@ -1,57 +1,71 @@
-const mongoose = require('mongoose');
+const { pool } = require('../config/database');
 
-const auctionSessionSchema = new mongoose.Schema({
-    sessionName: {
-        type: String,
-        required: true
-    },
-    startTime: {
-        type: String, // Store as "HH:MM:SS"
-        required: true
-    },
-    endTime: {
-        type: String, // Store as "HH:MM:SS"
-        required: true
-    },
-    maxBidsPerSession: {
-        type: Number,
-        default: 50
-    },
-    status: {
-        type: String,
-        enum: ['active', 'inactive'],
-        default: 'active'
+class AuctionSession {
+    // Get all active sessions
+    static async findAll() {
+        const sql = 'SELECT * FROM auction_sessions WHERE status = "active" ORDER BY start_time';
+        const [rows] = await pool.execute(sql);
+        return rows;
     }
-}, {
-    timestamps: true
-});
 
-// Get current or next session
-auctionSessionSchema.statics.getCurrentOrNextSession = function() {
-    const now = new Date();
-    const currentTime = now.toTimeString().split(' ')[0]; // "HH:MM:SS"
-    
-    return this.find({ status: 'active' })
-        .then(sessions => {
-            let currentSession = null;
-            let nextSession = null;
-            
-            for (const session of sessions) {
-                if (currentTime >= session.startTime && currentTime <= session.endTime) {
-                    currentSession = session;
-                    break;
-                } else if (currentTime < session.startTime && (!nextSession || session.startTime < nextSession.startTime)) {
-                    nextSession = session;
-                }
-            }
-            
-            // If no next session today, get first session tomorrow
-            if (!currentSession && !nextSession && sessions.length > 0) {
-                nextSession = sessions[0];
-            }
-            
-            return { currentSession, nextSession };
-        });
-};
+    // Get session by ID
+    static async findById(id) {
+        const sql = 'SELECT * FROM auction_sessions WHERE id = ?';
+        const [rows] = await pool.execute(sql, [id]);
+        return rows[0];
+    }
 
-module.exports = mongoose.model('AuctionSession', auctionSessionSchema);
+    // Get current or next session
+    static async getCurrentOrNext() {
+        const currentTime = new Date().toTimeString().split(' ')[0];
+        
+        const sql = `
+            SELECT * FROM auction_sessions 
+            WHERE status = 'active' 
+            ORDER BY 
+                CASE 
+                    WHEN ? BETWEEN start_time AND end_time THEN 1
+                    WHEN start_time > ? THEN 2
+                    ELSE 3
+                END,
+                start_time
+            LIMIT 2
+        `;
+        
+        const [rows] = await pool.execute(sql, [currentTime, currentTime]);
+        
+        let currentSession = null;
+        let nextSession = null;
+
+        if (rows.length > 0) {
+            const firstSession = rows[0];
+            const sessionStartTime = firstSession.start_time;
+            const sessionEndTime = firstSession.end_time;
+
+            if (currentTime >= sessionStartTime && currentTime <= sessionEndTime) {
+                currentSession = firstSession;
+                nextSession = rows[1] || null;
+            } else {
+                nextSession = firstSession;
+            }
+        }
+
+        return { currentSession, nextSession };
+    }
+
+    // Get session statistics
+    static async getSessionStats(sessionId) {
+        const sql = `
+            SELECT 
+                COUNT(*) as total_bids,
+                SUM(amount) as total_volume,
+                AVG(amount) as average_bid
+            FROM bids 
+            WHERE auction_session_id = ?
+        `;
+        const [rows] = await pool.execute(sql, [sessionId]);
+        return rows[0];
+    }
+}
+
+module.exports = AuctionSession;

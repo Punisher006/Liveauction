@@ -1,6 +1,8 @@
 const express = require('express');
 const Bid = require('../models/Bid');
-const User = require('../models/User');
+const BidPairing = require('../models/BidPairing');
+const AuctionSession = require('../models/AuctionSession');
+const SystemSetting = require('../models/SystemSetting');
 const auth = require('../middleware/auth');
 
 const router = express.Router();
@@ -8,44 +10,65 @@ const router = express.Router();
 // Place a bid
 router.post('/place', auth, async (req, res) => {
     try {
-        const { amount, period } = req.body;
+        const { amount, investmentPeriod } = req.body;
+
+        // Validate input
+        if (!amount || !investmentPeriod) {
+            return res.status(400).json({ message: 'Amount and investment period are required' });
+        }
+
+        // Get investment settings
+        const settings = await SystemSetting.getInvestmentSettings();
+        const minInvestment = parseInt(settings.min_investment);
+        const maxInvestment = parseInt(settings.max_investment);
 
         // Validate amount
-        if (amount < 500 || amount > 100000) {
+        if (amount < minInvestment || amount > maxInvestment) {
             return res.status(400).json({ 
-                message: 'Amount must be between KES 500 and KES 100,000' 
+                message: `Amount must be between KES ${minInvestment} and KES ${maxInvestment}` 
             });
         }
 
-        // Check if user has any pending bids
-        const pendingBid = await Bid.findOne({ 
-            userId: req.user._id, 
-            status: 'pending' 
-        });
+        // Validate investment period
+        if (![4, 8, 12].includes(parseInt(investmentPeriod))) {
+            return res.status(400).json({ message: 'Invalid investment period' });
+        }
 
-        if (pendingBid) {
+        // Check if user has active bid
+        const hasActiveBid = await Bid.hasActiveBid(req.user.id);
+        if (hasActiveBid) {
             return res.status(400).json({ 
-                message: 'You already have a pending bid. Please wait for it to be processed.' 
+                message: 'You already have an active bid. Please wait for it to be processed.' 
             });
         }
 
-        // Create new bid
-        const bid = new Bid({
-            userId: req.user._id,
-            amount,
-            period
+        // Get current or next auction session
+        const { currentSession } = await AuctionSession.getCurrentOrNext();
+        if (!currentSession) {
+            return res.status(400).json({ message: 'No active auction session at the moment' });
+        }
+
+        // Create bid
+        const bidId = await Bid.create({
+            userId: req.user.id,
+            auctionSessionId: currentSession.id,
+            amount: parseFloat(amount),
+            investmentPeriod: parseInt(investmentPeriod)
         });
 
-        await bid.save();
+        // Get created bid
+        const bid = await Bid.findById(bidId);
 
         res.status(201).json({
             message: 'Bid placed successfully',
             bid: {
-                id: bid._id,
+                id: bid.id,
                 amount: bid.amount,
-                period: bid.period,
-                expectedReturn: bid.expectedReturn,
-                status: bid.status
+                investmentPeriod: bid.investment_period,
+                expectedROI: bid.expected_roi,
+                expectedReturn: bid.expected_return,
+                status: bid.status,
+                sessionName: bid.session_name
             }
         });
     } catch (error) {
@@ -57,40 +80,55 @@ router.post('/place', auth, async (req, res) => {
 // Get user's bid status
 router.get('/status', auth, async (req, res) => {
     try {
-        const bids = await Bid.find({ userId: req.user._id })
-            .sort({ createdAt: -1 })
-            .limit(10);
+        const bids = await Bid.findByUserId(req.user.id);
 
-        // Simulate seller pairing (in real app, this would be more complex)
-        const bidsWithSellers = bids.map(bid => {
-            if (bid.status === 'pending' && !bid.sellers.length) {
-                // Simulate pairing after some time
-                const timeSinceCreation = Date.now() - bid.createdAt;
-                if (timeSinceCreation > 60000) { // 1 minute for demo
-                    bid.sellers = [{
-                        phone: '2547' + Math.floor(Math.random() * 100000000).toString().padStart(8, '0'),
-                        name: 'Demo Seller',
-                        status: 'pending',
-                        amount: bid.amount
-                    }];
-                    bid.status = 'paired';
-                    bid.save();
+        // For each bid, get pairings if any
+        const bidsWithDetails = await Promise.all(
+            bids.map(async (bid) => {
+                const pairings = await BidPairing.findByBidId(bid.id);
+                
+                // Simulate pairing for demo (in real app, this would be automated)
+                let sellers = [];
+                if (bid.status === 'paired' && pairings.length > 0) {
+                    sellers = pairings.map(p => ({
+                        phone: p.seller_phone,
+                        name: p.seller_mpesa_name,
+                        status: p.payment_status,
+                        amount: p.amount,
+                        paymentDeadline: p.payment_deadline
+                    }));
+                } else if (bid.status === 'pending') {
+                    // Simulate pairing after some time for demo
+                    const bidAge = Date.now() - new Date(bid.created_at).getTime();
+                    if (bidAge > 30000) { // 30 seconds for demo
+                        sellers = [{
+                            phone: '2547' + Math.floor(Math.random() * 100000000).toString().padStart(8, '0'),
+                            name: 'Demo Seller',
+                            status: 'pending',
+                            amount: bid.amount,
+                            paymentDeadline: new Date(Date.now() + 24 * 60 * 60 * 1000)
+                        }];
+                        // Update bid status to paired
+                        await Bid.updateStatus(bid.id, 'paired');
+                        bid.status = 'paired';
+                    }
                 }
-            }
 
-            return {
-                id: bid._id,
-                amount: bid.amount,
-                period: bid.period,
-                status: bid.status,
-                sellers: bid.sellers,
-                timer: bid.timer,
-                expectedReturn: bid.expectedReturn,
-                createdAt: bid.createdAt
-            };
-        });
+                return {
+                    id: bid.id,
+                    amount: bid.amount,
+                    period: bid.investment_period,
+                    status: bid.status,
+                    expectedReturn: bid.expected_return,
+                    sessionName: bid.session_name,
+                    timeRemaining: bid.time_remaining,
+                    sellers: sellers,
+                    createdAt: bid.created_at
+                };
+            })
+        );
 
-        res.json(bidsWithSellers);
+        res.json(bidsWithDetails);
     } catch (error) {
         console.error('Bid status error:', error);
         res.status(500).json({ message: 'Server error fetching bid status' });
@@ -102,49 +140,39 @@ router.post('/confirm-payment/:bidId', auth, async (req, res) => {
     try {
         const { bidId } = req.params;
 
-        const bid = await Bid.findOne({ 
-            _id: bidId, 
-            userId: req.user._id 
-        });
-
+        const bid = await Bid.findById(bidId);
         if (!bid) {
             return res.status(404).json({ message: 'Bid not found' });
+        }
+
+        // Check if user owns the bid
+        if (bid.user_id !== req.user.id) {
+            return res.status(403).json({ message: 'Access denied' });
         }
 
         if (bid.status !== 'paired') {
             return res.status(400).json({ message: 'Bid is not in a payable state' });
         }
 
-        // Update bid status
-        bid.status = 'paid';
-        bid.sellers[0].status = 'confirmed';
-        await bid.save();
+        // Update bid status to paid
+        await Bid.updateStatus(bidId, 'paid');
+
+        // Update pairing payment status
+        const pairings = await BidPairing.findByBidId(bidId);
+        if (pairings.length > 0) {
+            await BidPairing.updatePaymentStatus(pairings[0].id, 'paid');
+        }
 
         res.json({ 
             message: 'Payment confirmed successfully',
             bid: {
-                id: bid._id,
-                status: bid.status,
-                sellers: bid.sellers
+                id: bid.id,
+                status: 'paid'
             }
         });
     } catch (error) {
         console.error('Payment confirmation error:', error);
         res.status(500).json({ message: 'Server error confirming payment' });
-    }
-});
-
-// Get all bids (admin functionality)
-router.get('/all', auth, async (req, res) => {
-    try {
-        const bids = await Bid.find()
-            .populate('userId', 'fullName email phone')
-            .sort({ createdAt: -1 });
-
-        res.json(bids);
-    } catch (error) {
-        console.error('Get all bids error:', error);
-        res.status(500).json({ message: 'Server error fetching bids' });
     }
 });
 

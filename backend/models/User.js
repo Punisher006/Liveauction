@@ -1,93 +1,66 @@
-const mongoose = require('mongoose');
+const { pool } = require('../config/database');
 const bcrypt = require('bcryptjs');
 
-const userSchema = new mongoose.Schema({
-    fullName: {
-        type: String,
-        required: true,
-        trim: true
-    },
-    email: {
-        type: String,
-        required: true,
-        unique: true,
-        lowercase: true,
-        trim: true
-    },
-    phone: {
-        type: String,
-        required: true,
-        trim: true
-    },
-    password: {
-        type: String,
-        required: true,
-        minlength: 6
-    },
-    mpesaName: {
-        type: String,
-        trim: true
-    },
-    idNumber: {
-        type: String,
-        trim: true
-    },
-    profileImage: {
-        type: String,
-        default: null
-    },
-    balance: {
-        type: Number,
-        default: 0
-    },
-    totalInvested: {
-        type: Number,
-        default: 0
-    },
-    totalEarned: {
-        type: Number,
-        default: 0
-    },
-    accountStatus: {
-        type: String,
-        enum: ['active', 'suspended', 'pending'],
-        default: 'active'
-    },
-    verificationStatus: {
-        type: String,
-        enum: ['verified', 'pending', 'rejected'],
-        default: 'pending'
-    },
-    lastLogin: {
-        type: Date,
-        default: null
+class User {
+    // Create new user
+    static async create(userData) {
+        const { fullName, email, phone, password, mpesaName } = userData;
+        
+        const passwordHash = await bcrypt.hash(password, 10);
+        
+        const sql = `
+            INSERT INTO users (full_name, email, phone, password_hash, mpesa_name) 
+            VALUES (?, ?, ?, ?, ?)
+        `;
+        
+        const [result] = await pool.execute(sql, [fullName, email, phone, passwordHash, mpesaName]);
+        return result.insertId;
     }
-}, {
-    timestamps: true
-});
 
-// Hash password before saving
-userSchema.pre('save', async function(next) {
-    if (!this.isModified('password')) return next();
-    
-    try {
-        const salt = await bcrypt.genSalt(10);
-        this.password = await bcrypt.hash(this.password, salt);
-        next();
-    } catch (error) {
-        next(error);
+    // Find user by email
+    static async findByEmail(email) {
+        const sql = 'SELECT * FROM users WHERE email = ?';
+        const [rows] = await pool.execute(sql, [email]);
+        return rows[0];
     }
-});
 
-// Compare password method
-userSchema.methods.comparePassword = async function(candidatePassword) {
-    return await bcrypt.compare(candidatePassword, this.password);
-};
+    // Find user by ID
+    static async findById(id) {
+        const sql = 'SELECT id, full_name, email, phone, mpesa_name, balance, account_status, verification_status, created_at FROM users WHERE id = ?';
+        const [rows] = await pool.execute(sql, [id]);
+        return rows[0];
+    }
 
-// Update last login
-userSchema.methods.updateLastLogin = function() {
-    this.lastLogin = new Date();
-    return this.save();
-};
+    // Update user balance
+    static async updateBalance(userId, newBalance) {
+        const sql = 'UPDATE users SET balance = ? WHERE id = ?';
+        await pool.execute(sql, [newBalance, userId]);
+    }
 
-module.exports = mongoose.model('User', userSchema);
+    // Update last login
+    static async updateLastLogin(userId) {
+        const sql = 'UPDATE users SET last_login = NOW() WHERE id = ?';
+        await pool.execute(sql, [userId]);
+    }
+
+    // Compare password
+    static async comparePassword(plainPassword, hashedPassword) {
+        return await bcrypt.compare(plainPassword, hashedPassword);
+    }
+
+    // Get user statistics
+    static async getUserStats(userId) {
+        const sql = `
+            SELECT 
+                COUNT(*) as total_bids,
+                SUM(amount) as total_invested,
+                SUM(CASE WHEN status = 'completed' THEN expected_return - amount ELSE 0 END) as total_earned
+            FROM bids 
+            WHERE user_id = ?
+        `;
+        const [rows] = await pool.execute(sql, [userId]);
+        return rows[0];
+    }
+}
+
+module.exports = User;

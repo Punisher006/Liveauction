@@ -10,18 +10,13 @@ router.get('/my-transactions', auth, async (req, res) => {
     try {
         const { page = 1, limit = 20 } = req.query;
         
-        const transactions = await Transaction.find({ userId: req.user._id })
-            .sort({ createdAt: -1 })
-            .limit(limit * 1)
-            .skip((page - 1) * limit)
-            .populate('bidId', 'amount investmentPeriod');
-            
-        const total = await Transaction.countDocuments({ userId: req.user._id });
+        const transactions = await Transaction.findByUserId(req.user.id, parseInt(limit), parseInt(page));
+        const total = await Transaction.countByUserId(req.user.id);
         
         res.json({
             transactions,
             totalPages: Math.ceil(total / limit),
-            currentPage: page,
+            currentPage: parseInt(page),
             total
         });
     } catch (error) {
@@ -35,46 +30,48 @@ router.post('/create', auth, async (req, res) => {
     try {
         const { transactionType, amount, mpesaCode, mpesaPhone, description } = req.body;
         
-        const user = await User.findById(req.user._id);
-        const balanceBefore = user.balance;
+        const user = await User.findById(req.user.id);
+        const balanceBefore = user.balance || 0;
         let balanceAfter = balanceBefore;
         
         // Calculate new balance based on transaction type
         if (transactionType === 'deposit') {
-            balanceAfter = balanceBefore + amount;
+            balanceAfter = balanceBefore + parseFloat(amount);
         } else if (transactionType === 'withdrawal') {
-            if (balanceBefore < amount) {
+            if (balanceBefore < parseFloat(amount)) {
                 return res.status(400).json({ message: 'Insufficient balance' });
             }
-            balanceAfter = balanceBefore - amount;
+            balanceAfter = balanceBefore - parseFloat(amount);
+        } else if (transactionType === 'investment') {
+            if (balanceBefore < parseFloat(amount)) {
+                return res.status(400).json({ message: 'Insufficient balance for investment' });
+            }
+            balanceAfter = balanceBefore - parseFloat(amount);
         }
         
-        const transaction = new Transaction({
-            userId: req.user._id,
+        const transaction = await Transaction.create({
+            userId: req.user.id,
             transactionType,
-            amount,
+            amount: parseFloat(amount),
             balanceBefore,
             balanceAfter,
             mpesaCode,
             mpesaPhone,
             description,
-            status: 'completed' // For demo purposes
+            status: 'completed'
         });
         
-        await transaction.save();
-        
         // Update user balance
-        user.balance = balanceAfter;
-        await user.save();
+        await User.updateBalance(req.user.id, balanceAfter);
         
         res.status(201).json({
             message: 'Transaction completed successfully',
             transaction: {
-                id: transaction._id,
-                type: transaction.transactionType,
-                amount: transaction.amount,
-                balanceAfter: transaction.balanceAfter,
-                createdAt: transaction.createdAt
+                id: transaction,
+                type: transactionType,
+                amount: parseFloat(amount),
+                balanceAfter: balanceAfter,
+                createdAt: new Date()
             }
         });
     } catch (error) {
