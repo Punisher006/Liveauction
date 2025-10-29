@@ -43,6 +43,10 @@
     position: relative;
     z-index: 2;
     animation: slideUp 0.6s ease-out;
+
+    /* Backdrop filter with vendor prefixes */
+    -webkit-backdrop-filter: blur(10px);
+    backdrop-filter: blur(10px);
 }
 
 @keyframes slideUp {
@@ -361,4 +365,27 @@
     .auth-subtitle {
         font-size: 1rem;
     }
+}
+
+/* Input with icons */
+.input-with-icon {
+    position: relative;
+}
+
+.input-with-icon .form-icon {
+    position: absolute;
+    left: var(--space-lg);
+    top: 50%;
+    transform: translateY(-50%);
+    color: var(--text-muted);
+    transition: color var(--transition-normal);
+    z-index: 2;
+}
+
+.input-with-icon input {
+    padding-left: calc(var(--space-lg) * 2 + 10px);
+}
+
+.input-with-icon:focus-within .form-icon {
+    color: var(--primary-color);
 }

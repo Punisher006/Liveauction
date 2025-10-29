@@ -1,16 +1,33 @@
 const express = require('express');
 const cors = require('cors');
 const jwt = require('jsonwebtoken');
-const passwordResetRoutes = require('./routes/passwordReset');
 require('dotenv').config();
 
+const { securityHeaders, authLimiter, apiLimiter } = require('./middleware/security');
 const { testConnection, initializeDatabase } = require('./config/database');
 
 const app = express();
 
 // Middleware
-app.use(cors());
-app.use(express.json());
+app.use(securityHeaders);
+app.use(cors({
+    origin: process.env.CLIENT_URL || 'http://localhost:3000',
+    credentials: true
+}));
+
+// Rate limiting
+app.use('/api/auth/', authLimiter);
+app.use('/api/', apiLimiter);
+
+// Body parsing with limits
+app.use(express.json({ limit: '10kb' }));
+app.use(express.urlencoded({ extended: true, limit: '10kb' }));
+
+// Static files with cache control
+app.use(express.static('public', {
+    maxAge: '1d',
+    etag: false
+}));
 
 // Database connection check
 const initializeApp = async () => {
