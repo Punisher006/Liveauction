@@ -5,64 +5,119 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Login - Live Auction</title>
     <link rel="stylesheet" href="css/style.css">
+    <link rel="stylesheet" href="css/auth.css">
 </head>
 <body>
-    <header>
-        <h1>Live Auction Login</h1>
-        <p>Access your investment dashboard</p>
-    </header>
+    <div class="auth-container">
+        <div class="auth-card">
+            <div class="auth-header">
+                <div class="auth-logo">Live Auction</div>
+                <p class="auth-subtitle">Access your investment dashboard</p>
+            </div>
 
-    <main>
-        <section class="section auth-section">
-            <h2>Login to Your Account</h2>
-            <form id="login-form">
-                <div class="form-group">
-                    <label for="email">Email:</label>
-                    <input type="email" id="email" name="email" required>
-                </div>
-                <div class="form-group">
-                    <label for="password">Password:</label>
-                    <input type="password" id="password" name="password" required>
-                </div>
+            <form id="login-form" class="auth-form">
+                <div id="message-container"></div>
                 
-                 <button type="submit" class="auth-button">Login</button>
+                <div class="form-group">
+                    <label for="email">Email Address</label>
+                    <div class="input-with-icon">
+                        <span class="form-icon">✉️</span>
+                        <input type="email" id="email" name="email" placeholder="Enter your email" required>
+                    </div>
+                </div>
 
-               <!-- Forgot Password Link -->
-               <div style="text-align: center; margin: 15px 0;">
-                   <a href="forgot-password.html" style="color: #6c63ff; text-decoration: none;">
-                       Forgot your password?
-                   </a>
-               </div>
+                <div class="form-group">
+                    <label for="password">Password</label>
+                    <div class="input-with-icon">
+                        <span class="form-icon">🔒</span>
+                        <input type="password" id="password" name="password" placeholder="Enter your password" required>
+                        <button type="button" class="password-toggle" onclick="togglePassword()">👁️</button>
+                    </div>
+                </div>
+
+                <div class="auth-options">
+                    <div class="remember-me">
+                        <input type="checkbox" id="remember" name="remember">
+                        <label for="remember">Remember me</label>
+                    </div>
+                    <a href="#forgot-password" class="forgot-password">Forgot Password?</a>
+                </div>
+
+                <button type="submit" class="auth-button btn-primary" id="login-button">
+                    <span class="btn-text">Login to Account</span>
+                    <div class="loading hidden"></div>
+                </button>
+
+                <div class="auth-footer">
+                    <p>Don't have an account? <a href="register.html">Register here</a></p>
+                    <p><a href="index.html">← Back to Home</a></p>
+                </div>
             </form>
-            <div id="message" class="message"></div>
-            <p>Don't have an account? <a href="register.html">Register here</a></p>
-            <p><a href="index.html">← Back to Home</a></p>
-        </section>
-    </main>
-
-    <footer>
-        <p>&copy; 2025 Live Auction. All rights reserved.</p>
-    </footer>
+        </div>
+    </div>
 
     <script>
+        // Password toggle functionality
+        function togglePassword() {
+            const passwordInput = document.getElementById('password');
+            const toggleButton = document.querySelector('.password-toggle');
+            
+            if (passwordInput.type === 'password') {
+                passwordInput.type = 'text';
+                toggleButton.textContent = '🔒';
+            } else {
+                passwordInput.type = 'password';
+                toggleButton.textContent = '👁️';
+            }
+        }
+
+        // Show message function
+        function showMessage(message, type = 'error') {
+            const container = document.getElementById('message-container');
+            container.innerHTML = `<div class="message ${type}">${message}</div>`;
+            
+            // Auto-remove after 5 seconds
+            setTimeout(() => {
+                container.innerHTML = '';
+            }, 5000);
+        }
+
+        // Login form handler
         document.getElementById('login-form').addEventListener('submit', async (e) => {
             e.preventDefault();
             
-            const email = document.getElementById('email').value;
+            const email = document.getElementById('email').value.trim();
             const password = document.getElementById('password').value;
-            const messageDiv = document.getElementById('message');
+            const loginButton = document.getElementById('login-button');
+            const btnText = loginButton.querySelector('.btn-text');
+            const loading = loginButton.querySelector('.loading');
 
-            // Clear previous messages
-            messageDiv.innerHTML = '';
-            messageDiv.className = 'message';
+            // Basic validation
+            if (!email || !password) {
+                showMessage('Please fill in all fields');
+                return;
+            }
+
+            if (!isValidEmail(email)) {
+                showMessage('Please enter a valid email address');
+                return;
+            }
 
             try {
+                // Show loading state
+                btnText.textContent = 'Logging in...';
+                loading.classList.remove('hidden');
+                loginButton.disabled = true;
+
                 const response = await fetch('http://localhost:5000/api/auth/login', {
                     method: 'POST',
                     headers: {
                         'Content-Type': 'application/json',
                     },
-                    body: JSON.stringify({ email, password })
+                    body: JSON.stringify({ 
+                        email: email, 
+                        password: password 
+                    })
                 });
 
                 const data = await response.json();
@@ -72,21 +127,64 @@
                     localStorage.setItem('token', data.token);
                     localStorage.setItem('user', JSON.stringify(data.user));
                     
-                    // Show success message and redirect
-                    messageDiv.textContent = 'Login successful! Redirecting to dashboard...';
-                    messageDiv.className = 'message success';
+                    showMessage('Login successful! Redirecting...', 'success');
                     
+                    // Redirect to dashboard after short delay
                     setTimeout(() => {
                         window.location.href = 'home.html';
                     }, 1500);
+                    
                 } else {
-                    messageDiv.textContent = data.message || 'Login failed';
-                    messageDiv.className = 'message error';
+                    throw new Error(data.message || 'Login failed. Please check your credentials.');
                 }
+                
             } catch (error) {
                 console.error('Login error:', error);
-                messageDiv.textContent = 'Login failed. Please try again.';
-                messageDiv.className = 'message error';
+                
+                // More specific error messages
+                if (error.message.includes('Failed to fetch')) {
+                    showMessage('Cannot connect to server. Please check if the backend is running.');
+                } else if (error.message.includes('Invalid credentials')) {
+                    showMessage('Invalid email or password. Please try again.');
+                } else {
+                    showMessage(error.message || 'Login failed. Please try again.');
+                }
+            } finally {
+                // Reset button state
+                btnText.textContent = 'Login to Account';
+                loading.classList.add('hidden');
+                loginButton.disabled = false;
+            }
+        });
+
+        // Email validation
+        function isValidEmail(email) {
+            const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+            return emailRegex.test(email);
+        }
+
+        // Check if user is already logged in
+        document.addEventListener('DOMContentLoaded', function() {
+            const token = localStorage.getItem('token');
+            if (token) {
+                // Verify token is still valid
+                fetch('http://localhost:5000/api/auth/me', {
+                    headers: {
+                        'Authorization': `Bearer ${token}`
+                    }
+                })
+                .then(response => {
+                    if (response.ok) {
+                        window.location.href = 'home.html';
+                    } else {
+                        localStorage.removeItem('token');
+                        localStorage.removeItem('user');
+                    }
+                })
+                .catch(() => {
+                    localStorage.removeItem('token');
+                    localStorage.removeItem('user');
+                });
             }
         });
     </script>

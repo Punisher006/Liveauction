@@ -5,105 +5,363 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Register - Live Auction</title>
     <link rel="stylesheet" href="css/style.css">
+    <link rel="stylesheet" href="css/auth.css">
 </head>
 <body>
-    <header>
-        <h1>Live Auction Registration</h1>
-        <p>Join our peer-to-peer investment platform</p>
-    </header>
+    <div class="auth-container">
+        <div class="auth-card">
+            <div class="auth-header">
+                <div class="auth-logo">Live Auction</div>
+                <p class="auth-subtitle">Create your investment account</p>
+            </div>
 
-    <main>
-        <section class="section auth-section">
-            <h2>Create Your Account</h2>
-            <form id="register-form">
+            <form id="register-form" class="auth-form">
+                <div id="message-container"></div>
+                
                 <div class="form-group">
-                    <label for="fullName">Full Name:</label>
-                    <input type="text" id="fullName" name="fullName" required>
+                    <label for="fullName">Full Name</label>
+                    <div class="input-with-icon">
+                        <span class="form-icon">👤</span>
+                        <input type="text" id="fullName" name="fullName" placeholder="Enter your full name" required>
+                    </div>
                 </div>
+
                 <div class="form-group">
-                    <label for="email">Email:</label>
-                    <input type="email" id="email" name="email" required>
+                    <label for="email">Email Address</label>
+                    <div class="input-with-icon">
+                        <span class="form-icon">✉️</span>
+                        <input type="email" id="email" name="email" placeholder="Enter your email" required>
+                    </div>
                 </div>
+
                 <div class="form-group">
-                    <label for="phone">Mpesa Phone Number:</label>
-                    <input type="tel" id="phone" name="phone" pattern="[0-9]{10}" placeholder="07XXXXXXXX" required>
+                    <label for="phone">Mpesa Phone Number</label>
+                    <div class="input-with-icon">
+                        <span class="form-icon">📱</span>
+                        <input type="tel" id="phone" name="phone" pattern="[0-9]{10}" 
+                               placeholder="07XXXXXXXX" required>
+                    </div>
+                    <small class="input-hint">Enter your 10-digit Safaricom number (without +254)</small>
                 </div>
+
                 <div class="form-group">
-                    <label for="password">Password:</label>
-                    <input type="password" id="password" name="password" minlength="6" required>
+                    <label for="password">Password</label>
+                    <div class="input-with-icon">
+                        <span class="form-icon">🔒</span>
+                        <input type="password" id="password" name="password" 
+                               placeholder="Create a strong password" required minlength="6">
+                        <button type="button" class="password-toggle" onclick="togglePassword('password')">👁️</button>
+                    </div>
+                    <div id="password-strength" class="password-strength"></div>
                 </div>
+
                 <div class="form-group">
-                    <label for="confirmPassword">Confirm Password:</label>
-                    <input type="password" id="confirmPassword" name="confirmPassword" required>
+                    <label for="confirmPassword">Confirm Password</label>
+                    <div class="input-with-icon">
+                        <span class="form-icon">🔒</span>
+                        <input type="password" id="confirmPassword" name="confirmPassword" 
+                               placeholder="Confirm your password" required>
+                        <button type="button" class="password-toggle" onclick="togglePassword('confirmPassword')">👁️</button>
+                    </div>
+                    <div id="password-match" class="password-match"></div>
                 </div>
-                <button type="submit" class="auth-button">Register</button>
+
+                <div class="form-group enhanced-checkbox">
+                    <input type="checkbox" id="terms" name="terms" required>
+                    <label for="terms">
+                        I agree to the <a href="#terms" class="link">Terms of Service</a> and <a href="#privacy" class="link">Privacy Policy</a>
+                    </label>
+                </div>
+
+                <button type="submit" class="auth-button btn-primary" id="register-button">
+                    <span class="btn-text">Create Account</span>
+                    <div class="loading hidden"></div>
+                </button>
+
+                <div class="auth-footer">
+                    <p>Already have an account? <a href="login.html">Login here</a></p>
+                    <p><a href="index.html">← Back to Home</a></p>
+                </div>
             </form>
-            <div id="message" class="message"></div>
-            <p>Already have an account? <a href="login.html">Login here</a></p>
-            <p><a href="index.html">← Back to Home</a></p>
-        </section>
-    </main>
-
-    <footer>
-        <p>&copy; 2025 Live Auction. All rights reserved.</p>
-    </footer>
+        </div>
+    </div>
 
     <script>
+        // Password toggle functionality
+        function togglePassword(fieldId) {
+            const passwordInput = document.getElementById(fieldId);
+            const toggleButtons = document.querySelectorAll('.password-toggle');
+            
+            if (passwordInput.type === 'password') {
+                passwordInput.type = 'text';
+                toggleButtons.forEach(btn => btn.textContent = '🔒');
+            } else {
+                passwordInput.type = 'password';
+                toggleButtons.forEach(btn => btn.textContent = '👁️');
+            }
+        }
+
+        // Show message function
+        function showMessage(message, type = 'error') {
+            const container = document.getElementById('message-container');
+            container.innerHTML = `<div class="message ${type}">${message}</div>`;
+            
+            // Auto-remove after 5 seconds for success messages
+            if (type === 'success') {
+                setTimeout(() => {
+                    container.innerHTML = '';
+                }, 5000);
+            }
+        }
+
+        // Password strength checker
+        function checkPasswordStrength(password) {
+            const strength = {
+                0: { text: 'Very Weak', color: 'weak', class: 'weak' },
+                1: { text: 'Weak', color: 'weak', class: 'weak' },
+                2: { text: 'Fair', color: 'medium', class: 'medium' },
+                3: { text: 'Good', color: 'medium', class: 'medium' },
+                4: { text: 'Strong', color: 'strong', class: 'strong' }
+            };
+
+            let score = 0;
+            
+            // Length check
+            if (password.length >= 8) score++;
+            if (password.length >= 12) score++;
+            
+            // Character variety checks
+            if (/[a-z]/.test(password)) score++;
+            if (/[A-Z]/.test(password)) score++;
+            if (/[0-9]/.test(password)) score++;
+            if (/[^A-Za-z0-9]/.test(password)) score++;
+            
+            // Cap the score at 4
+            score = Math.min(score, 4);
+            
+            return strength[score];
+        }
+
+        // Phone number validation
+        function validatePhone(phone) {
+            const phoneRegex = /^(07\d{8}|7\d{8}|\+2547\d{8}|2547\d{8})$/;
+            return phoneRegex.test(phone.replace(/\s/g, ''));
+        }
+
+        // Format phone number
+        function formatPhone(phone) {
+            // Remove all non-digits
+            let cleaned = phone.replace(/\D/g, '');
+            
+            // Convert to 254 format
+            if (cleaned.startsWith('0')) {
+                cleaned = '254' + cleaned.substring(1);
+            } else if (cleaned.startsWith('7')) {
+                cleaned = '254' + cleaned;
+            } else if (cleaned.startsWith('254')) {
+                // Already in correct format
+            } else {
+                return null; // Invalid format
+            }
+            
+            return cleaned;
+        }
+
+        // Real-time password strength indicator
+        document.getElementById('password').addEventListener('input', function() {
+            const password = this.value;
+            const strengthIndicator = document.getElementById('password-strength');
+            
+            if (password.length === 0) {
+                strengthIndicator.innerHTML = '';
+                return;
+            }
+            
+            const strength = checkPasswordStrength(password);
+            strengthIndicator.innerHTML = `
+                <span class="${strength.class}">
+                    Password Strength: ${strength.text}
+                </span>
+            `;
+            
+            // Check password match in real-time
+            checkPasswordMatch();
+        });
+
+        // Real-time password match checking
+        document.getElementById('confirmPassword').addEventListener('input', checkPasswordMatch);
+
+        function checkPasswordMatch() {
+            const password = document.getElementById('password').value;
+            const confirmPassword = document.getElementById('confirmPassword').value;
+            const matchIndicator = document.getElementById('password-match');
+            
+            if (confirmPassword.length === 0) {
+                matchIndicator.innerHTML = '';
+                return;
+            }
+            
+            if (password === confirmPassword) {
+                matchIndicator.innerHTML = '<span class="strong">✓ Passwords match</span>';
+            } else {
+                matchIndicator.innerHTML = '<span class="weak">✗ Passwords do not match</span>';
+            }
+        }
+
+        // Registration form handler
         document.getElementById('register-form').addEventListener('submit', async (e) => {
             e.preventDefault();
             
+            const fullName = document.getElementById('fullName').value.trim();
+            const email = document.getElementById('email').value.trim();
+            const phone = document.getElementById('phone').value.trim();
             const password = document.getElementById('password').value;
             const confirmPassword = document.getElementById('confirmPassword').value;
-            const messageDiv = document.getElementById('message');
+            const terms = document.getElementById('terms').checked;
+            
+            const registerButton = document.getElementById('register-button');
+            const btnText = registerButton.querySelector('.btn-text');
+            const loading = registerButton.querySelector('.loading');
 
-            // Clear previous messages
-            messageDiv.innerHTML = '';
-            messageDiv.className = 'message';
-
-            if (password !== confirmPassword) {
-                messageDiv.textContent = 'Passwords do not match';
-                messageDiv.className = 'message error';
+            // Validation
+            if (!fullName || !email || !phone || !password || !confirmPassword) {
+                showMessage('Please fill in all fields');
                 return;
             }
 
-            const userData = {
-                fullName: document.getElementById('fullName').value,
-                email: document.getElementById('email').value,
-                phone: document.getElementById('phone').value,
-                password: password
-            };
+            if (!isValidEmail(email)) {
+                showMessage('Please enter a valid email address');
+                return;
+            }
+
+            if (!validatePhone(phone)) {
+                showMessage('Please enter a valid Safaricom phone number (e.g., 0712345678)');
+                return;
+            }
+
+            if (password.length < 6) {
+                showMessage('Password must be at least 6 characters long');
+                return;
+            }
+
+            if (password !== confirmPassword) {
+                showMessage('Passwords do not match');
+                return;
+            }
+
+            if (!terms) {
+                showMessage('Please agree to the Terms of Service and Privacy Policy');
+                return;
+            }
 
             try {
+                // Show loading state
+                btnText.textContent = 'Creating Account...';
+                loading.classList.remove('hidden');
+                registerButton.disabled = true;
+
+                // Format phone number
+                const formattedPhone = formatPhone(phone);
+                if (!formattedPhone) {
+                    throw new Error('Invalid phone number format');
+                }
+
                 const response = await fetch('http://localhost:5000/api/auth/register', {
                     method: 'POST',
                     headers: {
                         'Content-Type': 'application/json',
                     },
-                    body: JSON.stringify(userData)
+                    body: JSON.stringify({ 
+                        fullName: fullName,
+                        email: email,
+                        phone: formattedPhone,
+                        password: password
+                    })
                 });
 
                 const data = await response.json();
 
                 if (response.ok) {
-                    // Store token and user data
-                    localStorage.setItem('token', data.token);
-                    localStorage.setItem('user', JSON.stringify(data.user));
+                    showMessage('Account created successfully! Redirecting to login...', 'success');
                     
-                    // Show success message and redirect
-                    messageDiv.textContent = 'Registration successful! Redirecting to dashboard...';
-                    messageDiv.className = 'message success';
+                    // Clear form
+                    document.getElementById('register-form').reset();
+                    document.getElementById('password-strength').innerHTML = '';
+                    document.getElementById('password-match').innerHTML = '';
                     
+                    // Redirect to login after delay
                     setTimeout(() => {
-                        window.location.href = 'home.html';
-                    }, 1500);
+                        window.location.href = 'login.html';
+                    }, 2000);
+                    
                 } else {
-                    messageDiv.textContent = data.message || 'Registration failed';
-                    messageDiv.className = 'message error';
+                    throw new Error(data.message || 'Registration failed');
                 }
+                
             } catch (error) {
                 console.error('Registration error:', error);
-                messageDiv.textContent = 'Registration failed. Please try again.';
-                messageDiv.className = 'message error';
+                
+                // More specific error messages
+                if (error.message.includes('Failed to fetch')) {
+                    showMessage('Cannot connect to server. Please check if the backend is running.');
+                } else if (error.message.includes('User already exists')) {
+                    showMessage('An account with this email already exists. Please login instead.');
+                } else {
+                    showMessage(error.message || 'Registration failed. Please try again.');
+                }
+            } finally {
+                // Reset button state
+                btnText.textContent = 'Create Account';
+                loading.classList.add('hidden');
+                registerButton.disabled = false;
+            }
+        });
+
+        // Email validation
+        function isValidEmail(email) {
+            const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+            return emailRegex.test(email);
+        }
+
+        // Auto-format phone number as user types
+        document.getElementById('phone').addEventListener('input', function(e) {
+            let value = e.target.value.replace(/\D/g, '');
+            
+            // Auto-add 0 if starting with 7
+            if (value.startsWith('7') && value.length <= 9) {
+                value = '0' + value;
+            }
+            
+            // Limit to 10 digits
+            if (value.length > 10) {
+                value = value.substring(0, 10);
+            }
+            
+            e.target.value = value;
+        });
+
+        // Check if user is already logged in
+        document.addEventListener('DOMContentLoaded', function() {
+            const token = localStorage.getItem('token');
+            if (token) {
+                // Verify token is still valid
+                fetch('http://localhost:5000/api/auth/me', {
+                    headers: {
+                        'Authorization': `Bearer ${token}`
+                    }
+                })
+                .then(response => {
+                    if (response.ok) {
+                        window.location.href = 'home.html';
+                    } else {
+                        localStorage.removeItem('token');
+                        localStorage.removeItem('user');
+                    }
+                })
+                .catch(() => {
+                    localStorage.removeItem('token');
+                    localStorage.removeItem('user');
+                });
             }
         });
     </script>
