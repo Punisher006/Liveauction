@@ -1,0 +1,617 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Live Auction Dashboard</title>
+    <link rel="stylesheet" href="css/style.css">
+    <link rel="stylesheet" href="css/dashboard.css">
+</head>
+<body>
+    <header>
+        <div class="header-content">
+            <h1>Live Auction Dashboard</h1>
+            <p>Welcome to your investment control center</p>
+            
+            <!-- User Info & Notifications -->
+            <div class="top-buttons">
+                <div class="user-info">
+                    <span id="user-welcome">Welcome, User!</span>
+                    <div class="notification-bell">
+                        🔔
+                        <span class="notification-badge">3</span>
+                    </div>
+                </div>
+            </div>
+
+            <nav class="nav-menu">
+                <ul>
+                    <li><a href="#auction-timer" class="nav-link active">Auction Timer</a></li>
+                    <li><a href="#bidding" class="nav-link">Place Bid</a></li>
+                    <li><a href="#bid-status" class="nav-link">Bid Status</a></li>
+                    <li><a href="#stats" class="nav-link">Statistics</a></li>
+                    <li><a href="#contact" class="nav-link">Contact</a></li>
+                </ul>
+            </nav>
+        </div>
+    </header>
+
+    <main>
+        <!-- Quick Stats Section -->
+        <section id="stats" class="section">
+            <h2>Your Investment Overview</h2>
+            <div class="stats-grid">
+                <div class="stat-card">
+                    <div class="stat-number" id="total-invested">KES 0</div>
+                    <div class="stat-label">Total Invested</div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-number" id="total-earned">KES 0</div>
+                    <div class="stat-label">Total Earned</div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-number" id="active-bids">0</div>
+                    <div class="stat-label">Active Bids</div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-number" id="success-rate">0%</div>
+                    <div class="stat-label">Success Rate</div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Auction Timers Section -->
+        <section id="auction-timer" class="section">
+            <h2>🕒 Live Auction Timers</h2>
+            <div class="timer">
+                <p>Next Auction Session Starts In:</p>
+                <div id="timer" class="countdown">00:00:00</div>
+                <div class="auction-sessions">
+                    <div class="session-info">
+                        <strong>Today's Sessions:</strong>
+                        <span>9:00 AM - 10:00 AM</span>
+                        <span>1:00 PM - 2:00 PM</span>
+                        <span>7:30 PM - 8:30 PM</span>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Bidding Section -->
+        <section id="bidding" class="section">
+            <h2>🎯 Place Your Bid</h2>
+            <div class="auction-actions">
+                <form id="bid-form" class="auth-form">
+                    <div class="form-group">
+                        <label for="investment">Investment Amount (KES)</label>
+                        <input type="number" id="investment" name="investment" 
+                               min="500" max="100000" step="100" 
+                               placeholder="Enter amount between 500 - 100,000" required>
+                        <div class="amount-preview">
+                            <small>Minimum: KES 500 | Maximum: KES 100,000</small>
+                        </div>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="period">Investment Period</label>
+                        <select id="period" name="period" required>
+                            <option value="">Select Period</option>
+                            <option value="4">4 Days (30% ROI)</option>
+                            <option value="8">8 Days (60% ROI)</option>
+                            <option value="12">12 Days (95% ROI)</option>
+                        </select>
+                    </div>
+
+                    <!-- ROI Preview -->
+                    <div class="roi-preview card">
+                        <h4>Return on Investment Preview</h4>
+                        <div id="roi-details">
+                            <p>Select an investment period to see your potential returns</p>
+                        </div>
+                    </div>
+
+                    <button type="submit" class="auth-button btn-primary" id="bid-button">
+                        <span class="btn-text">Place Bid</span>
+                        <div class="loading hidden"></div>
+                    </button>
+                </form>
+            </div>
+        </section>
+
+        <!-- Bid Status Section -->
+        <section id="bid-status" class="section">
+            <h2>📊 Your Bid Status</h2>
+            <div id="bid-status-container">
+                <div class="loading-container">
+                    <div class="loading"></div>
+                    <p>Loading your bid status...</p>
+                </div>
+            </div>
+        </section>
+
+        <!-- Contact Section -->
+        <section id="contact" class="section">
+            <h2>📞 Contact Support</h2>
+            <div class="contact-info">
+                <div class="contact-methods">
+                    <div class="contact-item">
+                        <strong>Email:</strong>
+                        <a href="mailto:support@liveauction.com">support@liveauction.com</a>
+                    </div>
+                    <div class="contact-item">
+                        <strong>Phone:</strong>
+                        <a href="tel:+254700000000">+254 700 000 000</a>
+                    </div>
+                    <div class="contact-item">
+                        <strong>Response Time:</strong>
+                        <span>Within 2 hours during business hours</span>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Logout Section -->
+        <section id="logout-section" class="section text-center">
+            <button id="logout-button" class="btn-danger">
+                🚪 Logout
+            </button>
+        </section>
+    </main>
+
+    <footer>
+        <p>&copy; 2025 Live Auction. All rights reserved. | Secure Peer-to-Peer Investment Platform</p>
+        <p class="footer-links">
+            <a href="#privacy">Privacy Policy</a> | 
+            <a href="#terms">Terms of Service</a> | 
+            <a href="#help">Help Center</a>
+        </p>
+    </footer>
+
+    <script>
+        // User data and authentication
+        let userData = null;
+
+        // Initialize dashboard
+        document.addEventListener('DOMContentLoaded', async function() {
+            await checkAuthentication();
+            await loadUserData();
+            initializeBidForm();
+            loadBidStatus();
+            updateStats();
+            startAuctionTimer();
+        });
+
+        // Check if user is authenticated
+        async function checkAuthentication() {
+            const token = localStorage.getItem('token');
+            if (!token) {
+                window.location.href = 'login.html';
+                return;
+            }
+
+            try {
+                const response = await fetch('http://localhost:5000/api/auth/me', {
+                    headers: {
+                        'Authorization': `Bearer ${token}`
+                    }
+                });
+
+                if (!response.ok) {
+                    throw new Error('Not authenticated');
+                }
+
+                const data = await response.json();
+                userData = data.user;
+                document.getElementById('user-welcome').textContent = `Welcome, ${userData.fullName}!`;
+            } catch (error) {
+                console.error('Authentication error:', error);
+                localStorage.removeItem('token');
+                window.location.href = 'login.html';
+            }
+        }
+
+        // Load user data and statistics
+        async function loadUserData() {
+            // This would typically come from your API
+            // For demo purposes, we'll use mock data
+            const mockData = {
+                totalInvested: 15000,
+                totalEarned: 3200,
+                activeBids: 2,
+                successRate: 85
+            };
+
+            document.getElementById('total-invested').textContent = `KES ${mockData.totalInvested.toLocaleString()}`;
+            document.getElementById('total-earned').textContent = `KES ${mockData.totalEarned.toLocaleString()}`;
+            document.getElementById('active-bids').textContent = mockData.activeBids;
+            document.getElementById('success-rate').textContent = `${mockData.successRate}%`;
+        }
+
+        // Initialize bid form functionality
+        function initializeBidForm() {
+            const bidForm = document.getElementById('bid-form');
+            const investmentInput = document.getElementById('investment');
+            const periodSelect = document.getElementById('period');
+            const roiDetails = document.getElementById('roi-details');
+
+            // Update ROI preview when amount or period changes
+            function updateROIPreview() {
+                const amount = parseFloat(investmentInput.value) || 0;
+                const period = parseInt(periodSelect.value) || 0;
+
+                if (amount >= 500 && period > 0) {
+                    const roiRates = { 4: 0.3, 8: 0.6, 12: 0.95 };
+                    const roi = roiRates[period];
+                    const profit = amount * roi;
+                    const totalReturn = amount + profit;
+
+                    roiDetails.innerHTML = `
+                        <div class="roi-breakdown">
+                            <div class="roi-item">
+                                <span>Investment:</span>
+                                <strong>KES ${amount.toLocaleString()}</strong>
+                            </div>
+                            <div class="roi-item">
+                                <span>Profit (${roi * 100}%):</span>
+                                <strong class="profit">+KES ${profit.toLocaleString()}</strong>
+                            </div>
+                            <div class="roi-item total">
+                                <span>Total Return:</span>
+                                <strong class="total-return">KES ${totalReturn.toLocaleString()}</strong>
+                            </div>
+                        </div>
+                    `;
+                } else {
+                    roiDetails.innerHTML = '<p>Select an investment period to see your potential returns</p>';
+                }
+            }
+
+            investmentInput.addEventListener('input', updateROIPreview);
+            periodSelect.addEventListener('change', updateROIPreview);
+
+            // Handle form submission
+            bidForm.addEventListener('submit', async function(e) {
+                e.preventDefault();
+                
+                const amount = parseFloat(investmentInput.value);
+                const period = parseInt(periodSelect.value);
+
+                if (amount < 500 || amount > 100000) {
+                    showMessage('Investment must be between KES 500 and KES 100,000.', 'error');
+                    return;
+                }
+
+                if (![4, 8, 12].includes(period)) {
+                    showMessage('Please select a valid investment period.', 'error');
+                    return;
+                }
+
+                await placeBid(amount, period);
+            });
+        }
+
+        // Place bid function
+        async function placeBid(amount, period) {
+            const bidButton = document.getElementById('bid-button');
+            const btnText = bidButton.querySelector('.btn-text');
+            const loading = bidButton.querySelector('.loading');
+
+            try {
+                // Show loading state
+                btnText.textContent = 'Placing Bid...';
+                loading.classList.remove('hidden');
+                bidButton.disabled = true;
+
+                const response = await fetch('http://localhost:5000/api/bids/place', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'Authorization': `Bearer ${localStorage.getItem('token')}`
+                    },
+                    body: JSON.stringify({
+                        amount: amount,
+                        investmentPeriod: period
+                    })
+                });
+
+                const data = await response.json();
+
+                if (response.ok) {
+                    showMessage('Bid placed successfully! You will be paired with a seller shortly.', 'success');
+                    document.getElementById('bid-form').reset();
+                    document.getElementById('roi-details').innerHTML = '<p>Select an investment period to see your potential returns</p>';
+                    loadBidStatus();
+                    updateStats();
+                } else {
+                    throw new Error(data.message || 'Failed to place bid');
+                }
+            } catch (error) {
+                console.error('Bid placement error:', error);
+                showMessage(error.message || 'Failed to place bid. Please try again.', 'error');
+            } finally {
+                // Reset button state
+                btnText.textContent = 'Place Bid';
+                loading.classList.add('hidden');
+                bidButton.disabled = false;
+            }
+        }
+
+        // Load and display bid status
+        async function loadBidStatus() {
+            const container = document.getElementById('bid-status-container');
+
+            try {
+                const response = await fetch('http://localhost:5000/api/bids/status', {
+                    headers: {
+                        'Authorization': `Bearer ${localStorage.getItem('token')}`
+                    }
+                });
+
+                if (!response.ok) {
+                    throw new Error('Failed to fetch bid status');
+                }
+
+                const bids = await response.json();
+
+                if (bids.length === 0) {
+                    container.innerHTML = `
+                        <div class="empty-state">
+                            <div class="empty-icon">📭</div>
+                            <h3>No Active Bids</h3>
+                            <p>You haven't placed any bids yet. Start investing by placing your first bid above!</p>
+                        </div>
+                    `;
+                    return;
+                }
+
+                let statusHTML = `
+                    <div class="bids-table">
+                        <table>
+                            <thead>
+                                <tr>
+                                    <th>Amount</th>
+                                    <th>Period</th>
+                                    <th>Status</th>
+                                    <th>Expected Return</th>
+                                    <th>Seller Details</th>
+                                    <th>Time Remaining</th>
+                                    <th>Actions</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                `;
+
+                bids.forEach(bid => {
+                    const statusClass = `status-${bid.status}`;
+                    const sellerInfo = bid.sellers && bid.sellers.length > 0 
+                        ? bid.sellers.map(seller => `
+                            <div class="seller-card">
+                                <div class="seller-info">
+                                    <div><strong>Phone:</strong> ${seller.phone}</div>
+                                    <div><strong>Name:</strong> ${seller.name}</div>
+                                    <div><strong>Status:</strong> <span class="status-badge status-${seller.status}">${seller.status}</span></div>
+                                </div>
+                            </div>
+                        `).join('')
+                        : '<div class="no-seller">Awaiting seller allocation...</div>';
+
+                    const actions = bid.status === "paired" ? `
+                        <button onclick="confirmPayment('${bid.id}')" class="btn-success btn-sm">
+                            Confirm Payment
+                        </button>
+                    ` : '<span class="text-muted">N/A</span>';
+
+                    statusHTML += `
+                        <tr>
+                            <td><strong>KES ${bid.amount.toLocaleString()}</strong></td>
+                            <td>${bid.period} Days</td>
+                            <td><span class="status-badge ${statusClass}">${bid.status}</span></td>
+                            <td>KES ${bid.expectedReturn.toLocaleString()}</td>
+                            <td>${sellerInfo}</td>
+                            <td>${bid.timeRemaining || 'N/A'}</td>
+                            <td class="action-buttons">${actions}</td>
+                        </tr>
+                    `;
+                });
+
+                statusHTML += `</tbody></table></div>`;
+                container.innerHTML = statusHTML;
+
+            } catch (error) {
+                console.error('Error loading bid status:', error);
+                container.innerHTML = `
+                    <div class="error-state">
+                        <div class="error-icon">⚠️</div>
+                        <h3>Failed to Load Bid Status</h3>
+                        <p>${error.message}</p>
+                        <button onclick="loadBidStatus()" class="btn-primary">Try Again</button>
+                    </div>
+                `;
+            }
+        }
+
+        // Confirm payment function
+        async function confirmPayment(bidId) {
+            if (!confirm('Have you successfully sent the payment to the seller?')) {
+                return;
+            }
+
+            try {
+                const response = await fetch(`http://localhost:5000/api/bids/confirm-payment/${bidId}`, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'Authorization': `Bearer ${localStorage.getItem('token')}`
+                    }
+                });
+
+                if (response.ok) {
+                    showMessage('Payment confirmed successfully! The seller will verify your payment.', 'success');
+                    loadBidStatus();
+                    updateStats();
+                } else {
+                    throw new Error('Failed to confirm payment');
+                }
+            } catch (error) {
+                console.error('Payment confirmation error:', error);
+                showMessage('Failed to confirm payment. Please try again.', 'error');
+            }
+        }
+
+        // Auction timer functionality
+        function startAuctionTimer() {
+            function updateTimer() {
+                const auctionSlots = [
+                    { start: "09:00:00", end: "10:00:00" },
+                    { start: "13:00:00", end: "14:00:00" },
+                    { start: "19:30:00", end: "20:30:00" },
+                ];
+
+                const now = new Date();
+                let nextSlot = null;
+
+                // Find the next auction slot
+                for (const slot of auctionSlots) {
+                    const [startHours, startMinutes, startSeconds] = slot.start.split(":").map(Number);
+                    const start = new Date();
+                    start.setHours(startHours, startMinutes, startSeconds, 0);
+
+                    if (now < start) {
+                        nextSlot = { startTime: start, endTime: slot.end };
+                        break;
+                    }
+                }
+
+                // If no more slots today, set to the first slot tomorrow
+                if (!nextSlot) {
+                    const [startHours, startMinutes, startSeconds] = auctionSlots[0].start.split(":").map(Number);
+                    const tomorrow = new Date();
+                    tomorrow.setDate(tomorrow.getDate() + 1);
+                    tomorrow.setHours(startHours, startMinutes, startSeconds, 0);
+                    nextSlot = { startTime: tomorrow, endTime: auctionSlots[0].end };
+                }
+
+                const timerElement = document.getElementById('timer');
+
+                const interval = setInterval(() => {
+                    const now = new Date();
+                    const diff = nextSlot.startTime - now;
+
+                    if (diff <= 0) {
+                        const [endHours, endMinutes, endSeconds] = nextSlot.endTime.split(":").map(Number);
+                        const end = new Date(nextSlot.startTime);
+                        end.setHours(endHours, endMinutes, endSeconds);
+
+                        if (now < end) {
+                            const remaining = end - now;
+                            const hours = String(Math.floor(remaining / (1000 * 60 * 60))).padStart(2, "0");
+                            const minutes = String(Math.floor((remaining % (1000 * 60 * 60)) / (1000 * 60))).padStart(2, "0");
+                            const seconds = String(Math.floor((remaining % (1000 * 60)) / 1000)).padStart(2, "0");
+                            
+                            timerElement.textContent = `Auction Live! ${hours}:${minutes}:${seconds} remaining`;
+                            timerElement.style.color = '#28a745';
+                        } else {
+                            clearInterval(interval);
+                            timerElement.textContent = "Auction Closed";
+                            timerElement.style.color = '#dc3545';
+                            setTimeout(updateTimer, 5000);
+                        }
+                        return;
+                    }
+
+                    const hours = String(Math.floor(diff / (1000 * 60 * 60))).padStart(2, "0");
+                    const minutes = String(Math.floor((diff % (1000 * 60 * 60)) / (1000 * 60))).padStart(2, "0");
+                    const seconds = String(Math.floor((diff % (1000 * 60)) / 1000)).padStart(2, "0");
+
+                    timerElement.textContent = `${hours}:${minutes}:${seconds}`;
+                    timerElement.style.color = '#6c63ff';
+                }, 1000);
+            }
+
+            updateTimer();
+        }
+
+        // Update statistics (mock function)
+        function updateStats() {
+            // This would typically fetch fresh data from your API
+            console.log('Updating statistics...');
+        }
+
+        // Utility function to show messages
+        function showMessage(message, type = 'info') {
+            // Remove any existing messages
+            const existingMessages = document.querySelectorAll('.message');
+            existingMessages.forEach(msg => msg.remove());
+
+            const messageDiv = document.createElement('div');
+            messageDiv.className = `message ${type}`;
+            messageDiv.textContent = message;
+
+            // Insert at the top of the main content
+            const main = document.querySelector('main');
+            main.insertBefore(messageDiv, main.firstChild);
+
+            // Auto-remove after 5 seconds
+            setTimeout(() => {
+                if (messageDiv.parentNode) {
+                    messageDiv.remove();
+                }
+            }, 5000);
+        }
+
+        // Logout functionality
+        document.getElementById('logout-button').addEventListener('click', function() {
+            if (confirm('Are you sure you want to logout?')) {
+                localStorage.removeItem('token');
+                showMessage('You have been logged out successfully.', 'success');
+                setTimeout(() => {
+                    window.location.href = 'login.html';
+                }, 1500);
+            }
+        });
+
+        // Smooth scrolling for navigation
+        document.querySelectorAll('.nav-link').forEach(link => {
+            link.addEventListener('click', function(e) {
+                e.preventDefault();
+                const targetId = this.getAttribute('href');
+                const targetSection = document.querySelector(targetId);
+                
+                if (targetSection) {
+                    // Update active nav link
+                    document.querySelectorAll('.nav-link').forEach(nav => nav.classList.remove('active'));
+                    this.classList.add('active');
+                    
+                    // Smooth scroll to section
+                    targetSection.scrollIntoView({
+                        behavior: 'smooth',
+                        block: 'start'
+                    });
+                }
+            });
+        });
+
+        // Update active nav link on scroll
+        window.addEventListener('scroll', function() {
+            const sections = document.querySelectorAll('.section');
+            const navLinks = document.querySelectorAll('.nav-link');
+            
+            let currentSection = '';
+            
+            sections.forEach(section => {
+                const sectionTop = section.offsetTop - 100;
+                if (window.pageYOffset >= sectionTop) {
+                    currentSection = section.getAttribute('id');
+                }
+            });
+
+            navLinks.forEach(link => {
+                link.classList.remove('active');
+                if (link.getAttribute('href') === `#${currentSection}`) {
+                    link.classList.add('active');
+                }
+            });
+        });
+    </script>
+</body>
+</html>

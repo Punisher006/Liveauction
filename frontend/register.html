@@ -38,6 +38,7 @@
                 </div>
                 <button type="submit" class="auth-button">Register</button>
             </form>
+            <div id="message" class="message"></div>
             <p>Already have an account? <a href="login.html">Login here</a></p>
             <p><a href="index.html">← Back to Home</a></p>
         </section>
@@ -53,9 +54,15 @@
             
             const password = document.getElementById('password').value;
             const confirmPassword = document.getElementById('confirmPassword').value;
+            const messageDiv = document.getElementById('message');
+
+            // Clear previous messages
+            messageDiv.innerHTML = '';
+            messageDiv.className = 'message';
 
             if (password !== confirmPassword) {
-                alert('Passwords do not match');
+                messageDiv.textContent = 'Passwords do not match';
+                messageDiv.className = 'message error';
                 return;
             }
 
@@ -78,14 +85,25 @@
                 const data = await response.json();
 
                 if (response.ok) {
-                    alert('Registration successful! Please login.');
-                    window.location.href = 'login.html';
+                    // Store token and user data
+                    localStorage.setItem('token', data.token);
+                    localStorage.setItem('user', JSON.stringify(data.user));
+                    
+                    // Show success message and redirect
+                    messageDiv.textContent = 'Registration successful! Redirecting to dashboard...';
+                    messageDiv.className = 'message success';
+                    
+                    setTimeout(() => {
+                        window.location.href = 'home.html';
+                    }, 1500);
                 } else {
-                    alert(data.message || 'Registration failed');
+                    messageDiv.textContent = data.message || 'Registration failed';
+                    messageDiv.className = 'message error';
                 }
             } catch (error) {
                 console.error('Registration error:', error);
-                alert('Registration failed. Please try again.');
+                messageDiv.textContent = 'Registration failed. Please try again.';
+                messageDiv.className = 'message error';
             }
         });
     </script>

@@ -1,6 +1,7 @@
 const express = require('express');
 const cors = require('cors');
 const jwt = require('jsonwebtoken');
+const passwordResetRoutes = require('./routes/passwordReset');
 require('dotenv').config();
 
 const { testConnection, initializeDatabase } = require('./config/database');
@@ -27,6 +28,7 @@ app.use('/api/bids', require('./routes/bids'));
 app.use('/api/auctions', require('./routes/auctions'));
 app.use('/api/transactions', require('./routes/transactions'));
 app.use('/api/system', require('./routes/system'));
+app.use('/api/password-reset', require('./routes/passwordReset'));
 
 // Basic route
 app.get('/', (req, res) => {
