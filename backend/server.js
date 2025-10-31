@@ -1,135 +1,125 @@
 const express = require('express');
-const cors = require('cors');
+const compression = require('compression');
+const cookieParser = require('cookie-parser');
 require('dotenv').config();
 
+// Security middleware
+const {
+    securityHeaders,
+    authLimiter,
+    bidLimiter,
+    apiLimiter,
+    bruteForceLimiter,
+    corsOptions,
+    validateInput,
+    sqlInjectionCheck,
+    xssPrevention,
+    mongoSanitize,
+    xssClean,
+    hpp
+} = require('./middleware/security');
+
 const { testConnection, initializeDatabase } = require('./config/database');
+const errorHandler = require('./middleware/errorHandler');
 
 const app = express();
 
-// Middleware
-app.use(cors({
-    origin: ['http://localhost:3000', 'http://127.0.0.1:3000', 'http://localhost:5500', 'http://127.0.0.1:5500'],
-    credentials: true
-}));
-app.use(express.json());
+// Security Middleware (Order is important!)
+app.use(securityHeaders);
+app.use(compression());
+app.use(cors(corsOptions));
+app.use(express.json({ limit: '10kb' }));
+app.use(express.urlencoded({ extended: true, limit: '10kb' }));
+app.use(cookieParser());
+app.use(mongoSanitize);
+app.use(xssClean);
+app.use(hpp);
 
-// Test database connection on startup
-const initializeApp = async () => {
-    console.log('🔌 Testing database connection...');
-    const connected = await testConnection();
-    if (connected) {
-        await initializeDatabase();
-        console.log('✅ Database initialization completed');
-    } else {
-        console.log('⚠️  Starting without database connection');
-    }
-};
+// Custom security middleware
+app.use(sqlInjectionCheck);
+app.use(xssPrevention);
 
-// Basic route - Test if server is responding
-app.get('/', (req, res) => {
-    res.json({ 
-        message: 'Live Auction API is running!',
-        timestamp: new Date().toISOString(),
-        status: 'OK'
-    });
+// Rate limiting (apply after security middleware)
+app.use('/api/auth/', authLimiter);
+app.use('/api/bids/place', bidLimiter);
+app.use('/api/', apiLimiter);
+app.use('/api/', bruteForceLimiter);
+
+// Trust proxy (if behind reverse proxy like Nginx)
+app.set('trust proxy', 1);
+
+// Request logging middleware
+app.use((req, res, next) => {
+    console.log(`${new Date().toISOString()} - ${req.method} ${req.url} - IP: ${req.ip}`);
+    next();
 });
 
-// Health check with detailed info
-app.get('/health', async (req, res) => {
-    const healthcheck = {
-        status: 'OK',
-        timestamp: new Date().toISOString(),
-        uptime: process.uptime(),
-        memory: process.memoryUsage(),
-        database: 'checking...'
-    };
+// Routes (with input validation)
+const { 
+    registerSchema, 
+    loginSchema, 
+    bidSchema 
+} = require('./validation/schemas');
 
-    try {
-        const dbConnected = await testConnection();
-        healthcheck.database = dbConnected ? 'connected' : 'disconnected';
-        
-        if (!dbConnected) {
-            healthcheck.status = 'WARNING';
-            healthcheck.message = 'Database connection failed';
-        }
-    } catch (error) {
-        healthcheck.database = 'error';
-        healthcheck.status = 'ERROR';
-        healthcheck.message = error.message;
-    }
-
-    res.json(healthcheck);
-});
-
-// Routes
 app.use('/api/auth', require('./routes/auth'));
-app.use('/api/bids', require('./routes/bids'));
+app.use('/api/bids', validateInput(bidSchema), require('./routes/bids'));
 app.use('/api/auctions', require('./routes/auctions'));
 app.use('/api/transactions', require('./routes/transactions'));
 
+// Health check (no security for basic health checks)
+app.get('/health', (req, res) => {
+    res.status(200).json({
+        status: 'OK',
+        timestamp: new Date().toISOString(),
+        environment: process.env.NODE_ENV
+    });
+});
+
 // 404 handler
 app.use('*', (req, res) => {
-    res.status(404).json({ 
+    res.status(404).json({
         success: false,
-        message: 'API endpoint not found',
-        availableEndpoints: [
-            'GET  /',
-            'GET  /health',
-            'POST /api/auth/register',
-            'POST /api/auth/login',
-            'GET  /api/auth/me',
-            'POST /api/bids/place',
-            'GET  /api/bids/status',
-            'POST /api/bids/confirm-payment/:id'
-        ]
+        message: 'Route not found'
     });
 });
 
-// Error handling middleware
-app.use((error, req, res, next) => {
-    console.error('🚨 Server Error:', error);
-    res.status(500).json({ 
-        success: false,
-        message: 'Internal server error',
-        ...(process.env.NODE_ENV === 'development' && { error: error.message })
+// Global error handler (must be last)
+app.use(errorHandler);
+
+// Process termination handlers
+process.on('uncaughtException', (err) => {
+    console.error('UNCAUGHT EXCEPTION! 💥 Shutting down...');
+    console.error(err.name, err.message);
+    process.exit(1);
+});
+
+process.on('unhandledRejection', (err) => {
+    console.error('UNHANDLED REJECTION! 💥 Shutting down...');
+    console.error(err.name, err.message);
+    server.close(() => {
+        process.exit(1);
     });
 });
 
-// Start server
+process.on('SIGTERM', () => {
+    console.log('👋 SIGTERM RECEIVED. Shutting down gracefully');
+    server.close(() => {
+        console.log('💥 Process terminated!');
+    });
+});
+
 const PORT = process.env.PORT || 5000;
-
-app.listen(PORT, '0.0.0.0', async () => {
-    console.log('🚀 Starting Live Auction Server...');
-    console.log(`📍 Environment: ${process.env.NODE_ENV || 'development'}`);
-    console.log(`🔗 Server URL: http://localhost:${PORT}`);
-    console.log(`📊 Health Check: http://localhost:${PORT}/health`);
-    console.log(`⏰ Started at: ${new Date().toISOString()}`);
+const server = app.listen(PORT, async () => {
+    console.log(`🚀 Secure server running in ${process.env.NODE_ENV} mode on port ${PORT}`);
     
-    await initializeApp();
-    
-    console.log('✅ Server started successfully!');
-    console.log('📝 Available endpoints:');
-    console.log('   GET  /');
-    console.log('   GET  /health');
-    console.log('   POST /api/auth/register');
-    console.log('   POST /api/auth/login');
-    console.log('   GET  /api/auth/me');
-    console.log('   POST /api/bids/place');
-    console.log('   GET  /api/bids/status');
+    // Test database connection
+    const dbConnected = await testConnection();
+    if (dbConnected) {
+        await initializeDatabase();
+        console.log('✅ Database connected and initialized');
+    } else {
+        console.log('❌ Database connection failed');
+    }
 });
 
-// Handle graceful shutdown
-process.on('SIGINT', () => {
-    console.log('\n🛑 Shutting down server gracefully...');
-    process.exit(0);
-});
-
-process.on('uncaughtException', (error) => {
-    console.error('🚨 Uncaught Exception:', error);
-    process.exit(1);
-});
-
-process.on('unhandledRejection', (reason, promise) => {
-    console.error('🚨 Unhandled Rejection at:', promise, 'reason:', reason);
-    process.exit(1);
-});
+module.exports = server;
