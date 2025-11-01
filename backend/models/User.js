@@ -48,6 +48,21 @@ class User {
         return await bcrypt.compare(plainPassword, hashedPassword);
     }
 
+    // Count all users
+    static async countAll() {
+        const sql = 'SELECT COUNT(*) as count FROM users';
+        const [rows] = await pool.execute(sql);
+        return rows[0].count;
+   }
+
+    // Find user by phone
+    static async findByPhone(phone) {
+        const sanitizedPhone = sanitizeSQL(phone);
+        const sql = 'SELECT * FROM users WHERE phone = ?';
+        const [rows] = await pool.execute(sql, [sanitizedPhone]);
+        return rows[0];
+   }
+
     // Get user statistics
     static async getUserStats(userId) {
         const sql = `

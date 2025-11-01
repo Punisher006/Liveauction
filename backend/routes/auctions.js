@@ -2,6 +2,7 @@ const express = require('express');
 const AuctionSession = require('../models/AuctionSession');
 const Bid = require('../models/Bid');
 const auth = require('../middleware/auth');
+const logger = require('../middleware/logger');
 
 const router = express.Router();
 
@@ -9,10 +10,16 @@ const router = express.Router();
 router.get('/sessions', async (req, res) => {
     try {
         const sessions = await AuctionSession.findAll();
-        res.json(sessions);
+        res.json({
+            success: true,
+            data: sessions
+        });
     } catch (error) {
-        console.error('Get sessions error:', error);
-        res.status(500).json({ message: 'Server error fetching auction sessions' });
+        logger.error('Get sessions error:', error);
+        res.status(500).json({
+            success: false,
+            message: 'Server error fetching auction sessions'
+        });
     }
 });
 
@@ -22,30 +29,75 @@ router.get('/current-session', async (req, res) => {
         const { currentSession, nextSession } = await AuctionSession.getCurrentOrNext();
         
         res.json({
-            currentSession,
-            nextSession,
-            currentTime: new Date().toTimeString().split(' ')[0]
+            success: true,
+            data: {
+                currentSession,
+                nextSession,
+                currentTime: new Date().toTimeString().split(' ')[0]
+            }
         });
     } catch (error) {
-        console.error('Get current session error:', error);
-        res.status(500).json({ message: 'Server error fetching current session' });
+        logger.error('Get current session error:', error);
+        res.status(500).json({
+            success: false,
+            message: 'Server error fetching current session'
+        });
     }
 });
 
 // Get auction statistics
 router.get('/statistics', auth, async (req, res) => {
     try {
-        // This would require additional methods in Bid model
-        // For now, return basic stats
+        const totalBids = await Bid.countAll();
+        const activeBids = await Bid.countByStatus(['pending', 'paired']);
+        const completedBids = await Bid.countByStatus(['completed']);
+        
+        const totalVolume = await Bid.getTotalVolume();
+        
         res.json({
-            totalBids: 0,
-            activeBids: 0,
-            completedBids: 0,
-            totalVolume: 0
+            success: true,
+            data: {
+                totalBids,
+                activeBids,
+                completedBids,
+                totalVolume: totalVolume || 0
+            }
         });
     } catch (error) {
-        console.error('Get statistics error:', error);
-        res.status(500).json({ message: 'Server error fetching statistics' });
+        logger.error('Get statistics error:', error);
+        res.status(500).json({
+            success: false,
+            message: 'Server error fetching statistics'
+        });
+    }
+});
+
+// Get session by ID
+router.get('/sessions/:id', async (req, res) => {
+    try {
+        const session = await AuctionSession.findById(req.params.id);
+        if (!session) {
+            return res.status(404).json({
+                success: false,
+                message: 'Auction session not found'
+            });
+        }
+
+        const stats = await AuctionSession.getSessionStats(req.params.id);
+        
+        res.json({
+            success: true,
+            data: {
+                session,
+                stats
+            }
+        });
+    } catch (error) {
+        logger.error('Get session by ID error:', error);
+        res.status(500).json({
+            success: false,
+            message: 'Server error fetching session'
+        });
     }
 });
 

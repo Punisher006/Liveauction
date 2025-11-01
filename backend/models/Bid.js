@@ -1,4 +1,5 @@
 const { pool } = require('../config/database');
+const { sanitizeSQL } = require('../middleware/security');
 
 class Bid {
     // Create new bid
@@ -89,6 +90,28 @@ class Bid {
         `;
         const [rows] = await pool.execute(sql, [userId]);
         return rows[0].count > 0;
+    }
+
+    // Count all bids
+    static async countAll() {
+        const sql = 'SELECT COUNT(*) as count FROM bids';
+        const [rows] = await pool.execute(sql);
+        return rows[0].count;
+    }
+
+    // Count bids by status
+    static async countByStatus(statuses) {
+        const placeholders = statuses.map(() => '?').join(',');
+        const sql = `SELECT COUNT(*) as count FROM bids WHERE status IN (${placeholders})`;
+        const [rows] = await pool.execute(sql, statuses);
+        return rows[0].count;
+    }
+
+    // Get total volume of completed bids
+    static async getTotalVolume() {
+        const sql = 'SELECT COALESCE(SUM(amount), 0) as total FROM bids WHERE status = "completed"';
+        const [rows] = await pool.execute(sql);
+        return rows[0].total;
     }
 }
 

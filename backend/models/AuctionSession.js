@@ -58,13 +58,25 @@ class AuctionSession {
         const sql = `
             SELECT 
                 COUNT(*) as total_bids,
-                SUM(amount) as total_volume,
-                AVG(amount) as average_bid
+                COALESCE(SUM(amount), 0) as total_volume,
+                COALESCE(AVG(amount), 0) as average_bid,
+                COUNT(CASE WHEN status IN ('pending', 'paired') THEN 1 END) as active_bids
             FROM bids 
             WHERE auction_session_id = ?
         `;
         const [rows] = await pool.execute(sql, [sessionId]);
         return rows[0];
+    }
+
+    // Get current bids count for session
+    static async getCurrentBidCount(sessionId) {
+        const sql = `
+            SELECT COUNT(*) as current_bids 
+            FROM bids 
+            WHERE auction_session_id = ? AND status IN ('pending', 'paired')
+        `;
+        const [rows] = await pool.execute(sql, [sessionId]);
+        return rows[0].current_bids;
     }
 }
 

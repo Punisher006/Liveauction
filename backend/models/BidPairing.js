@@ -55,11 +55,18 @@ class BidPairing {
         const sql = `
             UPDATE bid_pairings 
             SET payment_status = ?, 
-                paid_at = CASE WHEN status = 'paid' THEN NOW() ELSE paid_at END,
-                confirmed_at = CASE WHEN status = 'confirmed' THEN NOW() ELSE confirmed_at END
+                paid_at = CASE WHEN ? = 'paid' THEN NOW() ELSE paid_at END,
+                confirmed_at = CASE WHEN ? = 'confirmed' THEN NOW() ELSE confirmed_at END
             WHERE id = ?
         `;
-        await pool.execute(sql, [status, pairingId]);
+        await pool.execute(sql, [status, status, status, pairingId]);
+    }
+
+    // Find pairing by ID
+    static async findById(pairingId) {
+        const sql = 'SELECT * FROM bid_pairings WHERE id = ?';
+        const [rows] = await pool.execute(sql, [pairingId]);
+        return rows[0];
     }
 }
 
