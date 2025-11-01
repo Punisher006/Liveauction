@@ -1,240 +1,121 @@
-const helmet = require('helmet');
 const rateLimit = require('express-rate-limit');
-const mongoSanitize = require('express-mongo-sanitize');
-const xss = require('xss-clean');
-const hpp = require('hpp');
-const cors = require('cors');
+const helmet = require('helmet');
+const validator = require('validator');
 
-// Security headers with Helmet
+// Security headers configuration
 const securityHeaders = helmet({
+    crossOriginEmbedderPolicy: false,
     contentSecurityPolicy: {
         directives: {
             defaultSrc: ["'self'"],
             styleSrc: ["'self'", "'unsafe-inline'", "https://fonts.googleapis.com"],
             fontSrc: ["'self'", "https://fonts.gstatic.com"],
-            scriptSrc: ["'self'", "'unsafe-inline'"],
+            scriptSrc: ["'self'"],
             imgSrc: ["'self'", "data:", "https:"],
             connectSrc: ["'self'"],
-            frameSrc: ["'none'"],
             objectSrc: ["'none'"],
-            baseUri: ["'self'"],
-            formAction: ["'self'"]
+            mediaSrc: ["'self'"],
+            frameSrc: ["'none'"]
         }
-    },
-    crossOriginEmbedderPolicy: true,
-    crossOriginOpenerPolicy: { policy: "same-origin" },
-    crossOriginResourcePolicy: { policy: "same-origin" },
-    dnsPrefetchControl: { allow: false },
-    frameguard: { action: 'deny' },
-    hidePoweredBy: true,
-    hsts: {
-        maxAge: 31536000,
-        includeSubDomains: true,
-        preload: true
-    },
-    ieNoOpen: true,
-    noSniff: true,
-    permittedCrossDomainPolicies: { permittedPolicies: "none" },
-    referrerPolicy: { policy: "strict-origin-when-cross-origin" }
+    }
 });
 
 // Rate limiting configurations
-const createRateLimit = (windowMs, max, message) => rateLimit({
-    windowMs,
-    max,
-    message: { 
-        success: false, 
-        message 
+const createAuthLimiter = () => rateLimit({
+    windowMs: 15 * 60 * 1000, // 15 minutes
+    max: 5, // Limit each IP to 5 requests per windowMs
+    message: {
+        error: 'Too many login attempts from this IP, please try again after 15 minutes.'
     },
     standardHeaders: true,
-    legacyHeaders: false,
-    handler: (req, res) => {
-        res.status(429).json({
-            success: false,
-            message,
-            retryAfter: Math.ceil(windowMs / 1000)
-        });
-    }
+    legacyHeaders: false
 });
 
-// Specific rate limiters
-const authLimiter = createRateLimit(
-    15 * 60 * 1000, // 15 minutes
-    5, // 5 attempts
-    'Too many login attempts from this IP, please try again after 15 minutes.'
-);
-
-const bidLimiter = createRateLimit(
-    60 * 1000, // 1 minute
-    3, // 3 bids per minute
-    'Too many bid attempts. Please wait a moment.'
-);
-
-const apiLimiter = createRateLimit(
-    15 * 60 * 1000, // 15 minutes
-    100, // 100 requests per 15 minutes
-    'Too many requests from this IP, please try again later.'
-);
-
-const bruteForceLimiter = createRateLimit(
-    60 * 60 * 1000, // 1 hour
-    10, // 10 requests per hour per IP
-    'Too many requests, please try again in an hour.'
-);
-
-// CORS configuration
-const corsOptions = {
-    origin: (origin, callback) => {
-        const allowedOrigins = [
-            process.env.CLIENT_URL,
-            'https://your-domain.com',
-            'https://www.your-domain.com'
-        ];
-        
-        // Allow requests with no origin (like mobile apps or curl requests)
-        if (!origin) return callback(null, true);
-        
-        if (allowedOrigins.indexOf(origin) === -1) {
-            const msg = 'The CORS policy for this site does not allow access from the specified Origin.';
-            return callback(new Error(msg), false);
-        }
-        return callback(null, true);
+const createApiLimiter = () => rateLimit({
+    windowMs: 15 * 60 * 1000, // 15 minutes
+    max: 100, // Limit each IP to 100 requests per windowMs
+    message: {
+        error: 'Too many requests from this IP, please try again after 15 minutes.'
     },
-    credentials: true,
-    methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS'],
-    allowedHeaders: [
-        'Content-Type',
-        'Authorization',
-        'X-Requested-With',
-        'X-CSRF-Token'
-    ],
-    maxAge: 86400 // 24 hours
-};
+    standardHeaders: true,
+    legacyHeaders: false
+});
 
-// Input validation middleware
-const validateInput = (schema) => (req, res, next) => {
-    const { error } = schema.validate(req.body);
-    if (error) {
-        return res.status(400).json({
-            success: false,
-            message: 'Validation failed',
-            errors: error.details.map(detail => detail.message)
+// Input sanitization middleware
+const sanitizeInput = (req, res, next) => {
+    // Sanitize body
+    if (req.body) {
+        Object.keys(req.body).forEach(key => {
+            if (typeof req.body[key] === 'string') {
+                req.body[key] = validator.escape(validator.trim(req.body[key]));
+            }
         });
     }
+
+    // Sanitize query parameters
+    if (req.query) {
+        Object.keys(req.query).forEach(key => {
+            if (typeof req.query[key] === 'string') {
+                req.query[key] = validator.escape(validator.trim(req.query[key]));
+            }
+        });
+    }
+
     next();
 };
 
-// SQL Injection prevention for MySQL
-const sqlInjectionCheck = (req, res, next) => {
+// Validate email format
+const validateEmail = (email) => {
+    return validator.isEmail(email) && 
+           validator.isLength(email, { min: 5, max: 255 });
+};
+
+// Validate phone number (Kenya format)
+const validatePhone = (phone) => {
+    const kenyanPhoneRegex = /^(?:\+254|0)?[17]\d{8}$/;
+    return kenyanPhoneRegex.test(phone.replace(/\s/g, ''));
+};
+
+// Validate password strength
+const validatePassword = (password) => {
+    const minLength = 8;
+    const hasUpperCase = /[A-Z]/.test(password);
+    const hasLowerCase = /[a-z]/.test(password);
+    const hasNumbers = /\d/.test(password);
+    const hasSpecialChar = /[!@#$%^&*(),.?":{}|<>]/.test(password);
+
+    return password.length >= minLength && 
+           hasUpperCase && 
+           hasLowerCase && 
+           hasNumbers && 
+           hasSpecialChar;
+};
+
+// SQL injection prevention
+const sanitizeSQL = (input) => {
+    if (typeof input !== 'string') return input;
+    
+    // Remove common SQL injection patterns
     const sqlInjectionPatterns = [
-        /(\b(SELECT|INSERT|UPDATE|DELETE|DROP|UNION|ALTER|CREATE|EXEC)\b)/i,
-        /('|"|;|--|\/\*|\*\/|@@|@|char|nchar|varchar|nvarchar)/i,
-        /(\b(OR|AND)\b\s+\d+\s*=\s*\d+)/i,
-        /(\b(WAITFOR|DELAY)\b\s+['"]\d+:\d+:\d+['"])/i,
-        /(xp_|sp_|fn_)/i
+        /(\b(SELECT|INSERT|UPDATE|DELETE|DROP|UNION|EXEC|ALTER|CREATE|TRUNCATE)\b)/gi,
+        /('|"|`|;|--|\/\*|\*\/|\\\*|\\\?)/g
     ];
-
-    const checkObject = (obj) => {
-        for (let key in obj) {
-            if (typeof obj[key] === 'string') {
-                for (let pattern of sqlInjectionPatterns) {
-                    if (pattern.test(obj[key])) {
-                        return true;
-                    }
-                }
-            } else if (typeof obj[key] === 'object' && obj[key] !== null) {
-                if (checkObject(obj[key])) return true;
-            }
-        }
-        return false;
-    };
-
-    if (checkObject(req.body) || checkObject(req.query) || checkObject(req.params)) {
-        // Log the attempt
-        console.warn('SQL Injection attempt detected:', {
-            ip: req.ip,
-            method: req.method,
-            url: req.url,
-            body: req.body,
-            query: req.query,
-            params: req.params
-        });
-
-        return res.status(400).json({
-            success: false,
-            message: 'Invalid input detected'
-        });
-    }
-
-    next();
-};
-
-// XSS Prevention
-const xssPrevention = (req, res, next) => {
-    const xssPatterns = [
-        /<script\b[^<]*(?:(?!<\/script>)<[^<]*)*<\/script>/gi,
-        /javascript:/gi,
-        /on\w+\s*=/gi,
-        /<iframe/gi,
-        /<object/gi,
-        /<embed/gi,
-        /<applet/gi,
-        /<meta/gi,
-        /<link/gi,
-        /vbscript:/gi
-    ];
-
-    const sanitizeObject = (obj) => {
-        for (let key in obj) {
-            if (typeof obj[key] === 'string') {
-                let sanitized = obj[key];
-                for (let pattern of xssPatterns) {
-                    sanitized = sanitized.replace(pattern, '');
-                }
-                // Remove potentially dangerous characters
-                sanitized = sanitized.replace(/[<>]/g, '');
-                obj[key] = sanitized;
-            } else if (typeof obj[key] === 'object' && obj[key] !== null) {
-                sanitizeObject(obj[key]);
-            }
-        }
-    };
-
-    sanitizeObject(req.body);
-    sanitizeObject(req.query);
-    sanitizeObject(req.params);
-
-    next();
-};
-
-// CSRF Protection (for forms if needed)
-const csrfProtection = (req, res, next) => {
-    if (['POST', 'PUT', 'DELETE'].includes(req.method)) {
-        const csrfToken = req.headers['x-csrf-token'] || req.body._csrf;
-        const sessionToken = req.session?.csrfToken;
-        
-        if (!csrfToken || csrfToken !== sessionToken) {
-            return res.status(403).json({
-                success: false,
-                message: 'Invalid CSRF token'
-            });
-        }
-    }
-    next();
+    
+    let sanitized = input;
+    sqlInjectionPatterns.forEach(pattern => {
+        sanitized = sanitized.replace(pattern, '');
+    });
+    
+    return validator.escape(sanitized);
 };
 
 module.exports = {
     securityHeaders,
-    authLimiter,
-    bidLimiter,
-    apiLimiter,
-    bruteForceLimiter,
-    corsOptions,
     createAuthLimiter,
     createApiLimiter,
     sanitizeInput,
     validateEmail,
     validatePhone,
     validatePassword,
-    sanitizeSQLInput,
+    sanitizeSQL
 };

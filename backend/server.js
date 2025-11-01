@@ -12,9 +12,6 @@ const { testConnection, initializeDatabase } = require('./config/database');
 const errorHandler = require('./middleware/errorHandler');
 const notFound = require('./middleware/notFound');
 
-// Logger
-const logger = require('./middleware/logger');
-
 const app = express();
 
 // Security Middleware
@@ -37,7 +34,7 @@ app.use(helmet({
 
 // CORS configuration
 app.use(cors({
-    origin: process.env.CLIENT_URL || 'http://localhost:3000',
+    origin: process.env.CLIENT_URL || 'http://localhost:5000',
     credentials: true,
     methods: ['GET', 'POST', 'PUT', 'DELETE'],
     allowedHeaders: ['Content-Type', 'Authorization', 'X-Requested-With']
@@ -45,8 +42,8 @@ app.use(cors({
 
 // Rate limiting
 const authLimiter = rateLimit({
-    windowMs: 15 * 60 * 1000, // 15 minutes
-    max: 5, // Limit each IP to 5 requests per windowMs
+    windowMs: 15 * 60 * 1000,
+    max: 5,
     message: {
         error: 'Too many login attempts from this IP, please try again after 15 minutes.'
     },
@@ -55,8 +52,8 @@ const authLimiter = rateLimit({
 });
 
 const apiLimiter = rateLimit({
-    windowMs: 15 * 60 * 1000, // 15 minutes
-    max: 100, // Limit each IP to 100 requests per windowMs
+    windowMs: 15 * 60 * 1000,
+    max: 100,
     message: {
         error: 'Too many requests from this IP, please try again after 15 minutes.'
     },
@@ -81,16 +78,11 @@ app.use(compression());
 
 // Request logging
 app.use((req, res, next) => {
-    logger.info('Incoming Request', {
-        method: req.method,
-        url: req.originalUrl,
-        ip: req.ip,
-        userAgent: req.get('User-Agent')
-    });
+    console.log(`${new Date().toISOString()} - ${req.method} ${req.originalUrl} - IP: ${req.ip}`);
     next();
 });
 
-// Health check (no auth required)
+// Health check
 app.get('/health', async (req, res) => {
     const healthcheck = {
         uptime: process.uptime(),
@@ -106,63 +98,55 @@ app.get('/health', async (req, res) => {
         healthcheck.checks.database = 'ERROR';
     }
 
-    healthcheck.checks.memory = {
-        used: `${Math.round(process.memoryUsage().heapUsed / 1024 / 1024)}MB`,
-        total: `${Math.round(process.memoryUsage().heapTotal / 1024 / 1024)}MB`
-    };
-
     res.status(healthcheck.checks.database === 'OK' ? 200 : 503).json(healthcheck);
 });
 
-// API Routes
-app.use('/api/auth', require('./routes/auth'));
-app.use('/api/bids', require('./routes/bids'));
-app.use('/api/auctions', require('./routes/auctions'));
-app.use('/api/transactions', require('./routes/transactions'));
+// API Routes - IMPORTANT: Import routes correctly
+const authRoutes = require('./routes/auth');
+const bidsRoutes = require('./routes/bids');
+const auctionsRoutes = require('./routes/auctions');
+const transactionsRoutes = require('./routes/transactions');
+
+app.use('/api/auth', authRoutes);
+app.use('/api/bids', bidsRoutes);
+app.use('/api/auctions', auctionsRoutes);
+app.use('/api/transactions', transactionsRoutes);
 
 // 404 handler
 app.use(notFound);
 
-// Error handler (must be last)
+// Error handler
 app.use(errorHandler);
 
 // Process event handlers
 process.on('unhandledRejection', (err, promise) => {
-    logger.error('Unhandled Rejection at:', promise, 'Reason:', err);
+    console.error('Unhandled Rejection at:', promise, 'Reason:', err);
     process.exit(1);
 });
 
 process.on('uncaughtException', (err) => {
-    logger.error('Uncaught Exception thrown:', err);
+    console.error('Uncaught Exception thrown:', err);
     process.exit(1);
-});
-
-// Graceful shutdown
-process.on('SIGTERM', () => {
-    logger.info('SIGTERM received, shutting down gracefully');
-    process.exit(0);
 });
 
 const PORT = process.env.PORT || 5000;
 
 const startServer = async () => {
     try {
-        // Test database connection
         const dbConnected = await testConnection();
         if (!dbConnected) {
-            logger.error('Failed to connect to database');
+            console.error('Failed to connect to database');
             process.exit(1);
         }
 
-        // Initialize database
         await initializeDatabase();
 
         app.listen(PORT, () => {
-            logger.info(`🚀 Server running in ${process.env.NODE_ENV} mode on port ${PORT}`);
-            logger.info(`📊 Health check available at: http://localhost:${PORT}/health`);
+            console.log(`🚀 Server running on port ${PORT}`);
+            console.log(`📊 Health: http://localhost:${PORT}/health`);
         });
     } catch (error) {
-        logger.error('Failed to start server:', error);
+        console.error('Failed to start server:', error);
         process.exit(1);
     }
 };
