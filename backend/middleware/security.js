@@ -230,11 +230,11 @@ module.exports = {
     apiLimiter,
     bruteForceLimiter,
     corsOptions,
-    validateInput,
-    sqlInjectionCheck,
-    xssPrevention,
-    csrfProtection,
-    mongoSanitize: mongoSanitize(),
-    xssClean: xss(),
-    hpp: hpp()
+    createAuthLimiter,
+    createApiLimiter,
+    sanitizeInput,
+    validateEmail,
+    validatePhone,
+    validatePassword,
+    sanitizeSQLInput,
 };
